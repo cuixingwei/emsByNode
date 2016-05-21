@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <script type="text/javascript">
+        var grid;
+        var exportData = function () {
+            var url = "/center/exportTalkTime?startTime="
+                    + $('#startTime').datetimebox('getValue') + "&endTime="
+                    + $('#endTime').datetimebox('getValue') + "&overtimes="
+                    + $('#overtimes').val() + "&dispatcher="
+                    + $('#dispatcher').combobox('getValue');
+            window.location.href = url;
+        };
+        /* 初始化页面标签 */
+        function init() {
+            $('#startTime').datetimebox({
+                required: true,
+                value: firstOfMouth()
+            });
+            $('#endTime').datetimebox({
+                value: getCurrentTime()
+            })
+            $('#dispatcher').combobox({
+                url: '/dictionary/getDispatcher',
+                valueField: 'id',
+                textField: 'name',
+                method: 'get',
+                panelHeight: 'auto',
+                editable: false,
+                onLoadSuccess: function (data) {
+                    if (data.success == 'fail') {
+                        parent.$.messager.alert('提示', '你的会话已失效,请重新登陆!', 'info', function () {
+                            window.parent.location.href = "/";
+                        });
+                    } else if (data) {
+                        $('#dispatcher').combobox('setValue', data[0].id);
+                    }
+                }
+            });
+            $('#overtimes').numberbox({
+                min: 0
+            });
+            grid = $('#grid').datagrid(
+                    {
+                        url: '/center/getTalkTime',
+                        pagePosition: 'bottom',
+                        pagination: true,
+                        striped: true,
+                        singleSelect: true,
+                        rownumbers: true,
+                        idField: 'id',
+                        pageSize: 20,
+                        pageList: [10, 20, 30, 40, 50, 100, 200, 300,
+                            400, 500],
+                        columns: [[
+                            {
+                                field: 'dispatcher',
+                                title: '调度员',
+                                width: "15%",
+                                align: 'center'
+                            },
+                            {
+                                field: 'beginTime',
+                                title: '通话开始时刻',
+                                width: "15%",
+                                align: 'center'
+                            },
+                            {
+                                field: 'finishTime',
+                                title: '通话结束时刻',
+                                width: "15%",
+                                align: 'center'
+                            },
+                            {
+                                field: 'times',
+                                title: '通话时长',
+                                width: "10%",
+                                align: 'center'
+                            },
+                            {
+                                field: 'telLogType',
+                                title: '通话类型',
+                                width: "10%",
+                                align: 'center'
+                            },
+                            {
+                                field: 'teleNo',
+                                title: '对方电话',
+                                width: "13%",
+                                align: 'center'
+                            },
+                            {
+                                field: 'remark',
+                                title: '备注',
+                                width: "19%",
+                                align: 'center'
+                            }]],
+                        toolbar: '#toolbar',
+                        onBeforeLoad: function (param) {
+                            var varify = cxw.checkStartTimeBeforeEndTime(
+                                    '#startTime', '#endTime');
+                            if (!varify) {
+                                parent.$.messager.alert('警告', '结束时间要大于开始时间', 'warning');
+                            }
+                        },
+                        onLoadSuccess: function (data) {
+                            $(this).datagrid("autoMergeCells",
+                                    ['dispatcher']);
+                        }
+                    });
+        }
+
+        $(document).ready(function () {
+            init();
+            grid.datagrid('load', cxw.serializeObject($('#searchForm')));
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div id="toolbar" style="display: none;">
+    <table>
+        <tr>
+            <td>
+                <form id="searchForm">
+                    <table>
+                        <tr>
+                            <td>查询时间</td>
+                            <td><input id="startTime" name="startTime"
+                                       style="width: 150em;"/>至<input id="endTime" name="endTime"
+                                                                      style="width: 150em;"/></td>
+                            <td>调度员:</td>
+                            <td><input style="width: 80em" id="dispatcher"
+                                       name="dispatcher"/></td>
+                            <td>超时时长(秒):</td>
+                            <td><input type="text" style="width: 90px" value="15"
+                                       id="overtimes" name="overtimes"/></td>
+                            <td><a href="javascript:void(0);" class="easyui-linkbutton"
+                                   data-options="iconCls:'ext-icon-zoom',plain:true"
+                                   onclick=" grid.datagrid('load', cxw.serializeObject($('#searchForm')));">查询</a>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-table_go',plain:true"
+                   onclick="exportData();">导出</a></td>
+        </tr>
+    </table>
+</div>
+
+<div data-options="region:'center',fit:true,border:false">
+    <table id="grid" data-options="fit:true,border:false"></table>
+</div>
+
+
+</body>
+</html>

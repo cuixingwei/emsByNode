@@ -1,0 +1,56 @@
+@CHARSET "UTF-8";
+.login_li {
+    height: 30px;
+    line-height: 30px;
+    text-align: left;
+}
+
+.login_li_bg {
+    font-size: 12px;
+    font-weight: bold;
+    color: #666666;
+}
+
+.input_user {
+    line-height: 20px;
+    height: 21px;
+    width: 213px;
+    border: solid 1px #CCCCCC;
+    margin: 0px;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+
+}
+
+li {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    background:#4aa3ff url(../images/newloginbg.jpg) no-repeat center top ;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.divMain {
+    height: 650px;
+    width: 800px;
+    margin-top: 150px;
+    background: url(../images/newloginMain.png) no-repeat center;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+#divLogin {
+    float: right;
+    margin-top: 155px;
+    margin-right: 0px;
+    width: 300px;
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <style>
+        label {
+            width: 100px !important;
+            text-align: right !important;
+            display: inline-block !important;
+            margin-right: 5px !important;
+            color: #000 !important;
+        }
+        .th {
+            width: 24%;
+            display: inline-block
+        }
+        .th_left {
+            width: 25%;
+            float: left;
+            display: inline-block
+        }
+        .th_right {
+            width: 25%;
+            float: right;
+            display: inline-block
+        }
+
+        .th_left_half {
+            width: 49%;
+            display: inline-block
+        }
+        .th_right_half {
+            width: 49%;
+            float: right;
+            display: inline-block
+        }
+
+        .input_width {
+            width: 15em;
+        }
+        .input_width_length {
+            width: 38em;
+        }
+        .tr_height {
+            margin-bottom: 3px;
+        }
+    </style>
+    <script>
+        var grid;
+        /*初始化页面*/
+        var init = function () {
+            grid = $('#grid').datagrid(
+                    {
+                        url: '/center/getPatientCase',
+                        pagePosition: 'bottom',
+                        pagination: true,
+                        striped: true,
+                        singleSelect: true,
+                        rownumbers: true,
+                        idField: 'acceptTime',
+                        pageSize: 20,
+                        pageList: [10, 20, 30, 40, 50, 100, 200, 300, 400, 500],
+                        columns: [[{
+                            field: 'name',
+                            title: '姓名',
+                            width: "10%",
+                            align: 'center'
+                        }, {
+                            field: 'linkman',
+                            title: '联系人',
+                            width: "10%",
+                            align: 'center'
+                        }, {
+                            field: 'linkTel',
+                            title: '联系电话',
+                            width: "15%",
+                            align: 'center'
+                        }, {
+                            field: 'chiefComplaint',
+                            title: '病人主诉',
+                            width: "20%",
+                            align: 'center'
+                        }, {
+                            field: 'primaryDiagnosis',
+                            title: '初步诊断',
+                            width: "20%",
+                            align: 'center'
+                        }, {
+                            field: 'localAddr',
+                            title: '救治地点',
+                            width: "18%",
+                            align: 'center'
+                        }]],
+                        toolbar: '#toolbar',
+                        onDblClickRow: function (rowIndex, rowData) {
+                            showDetail(rowData.task_id);
+                        }
+                    });
+        };
+        var showDetail = function(task_id){
+            $.post('/center/getPatientCase',{task_id:task_id},function(data){
+                $('#form1').form('load', {
+                    "name":data[0].name,
+                    "sex":data[0].sex,
+                    "historyProvider":data[0].historyProvider,
+                    "localAddrType":data[0].localAddrType,
+                    "age":data[0].age,
+                    "nationality":data[0].nationality,
+                    "fillPerson":data[0].fillPerson,
+                    "sendAddrType":data[0].sendAddrType,
+                    "signTime":data[0].signTime,
+                    "cureResult":data[0].cureResult,
+                    "lastAlterPerson":data[0].lastAlterPerson,
+                    "patientCooperate":data[0].patientCooperate,
+                    "folk":data[0].folk,
+                    "illnessState":data[0].illnessState,
+                    "lastAlterTime":data[0].lastAlterTime,
+                    "alarmReason":data[0].alarmReason,
+                    "doctor":data[0].doctor,
+                    "nurse":data[0].nurse,
+                    "fillTime":data[0].fillTime,
+                    "illnessType":data[0].illnessType,
+                    "linkman":data[0].linkman,
+                    "linkTel":data[0].linkTel,
+                    "arrivePatientTime":data[0].arrivePatientTime,
+                    "treatmentOther":data[0].treatmentOther,
+                    "treatment":data[0].treatment,
+                    "localAddr":data[0].localAddr,
+                    "chiefComplaint":data[0].chiefComplaint,
+                    "presentIllness":data[0].presentIllness,
+                    "pastIllness":data[0].pastIllness,
+                    "drugAllergyHistory":data[0].drugAllergyHistory,
+                    "primaryDiagnosis":data[0].primaryDiagnosis,
+                    "drugUsage":data[0].drugUsage,
+                    "remark":data[0].remark
+                });
+            });
+
+        };
+        $(document).ready(function () {
+            var event_id = '<%= event_id %>';
+            init();
+            grid.datagrid('load', {event_id:event_id});
+        });
+    </script>
+</head>
+<body class="easyui-layout">
+<div data-options="region:'north',title:'患者信息',split:true" style="height:30%;padding:5px;background:#eee;">
+    <table id="grid" data-options="fit:true,border:false"></table>
+</div>
+<div data-options="region:'center',title:'患者详细信息'" style="padding:5px;background:#eee;">
+    <form id="form1">
+        <div class="tr_height">
+            <div class="th_left">
+                <label class="label">姓名:</label>
+                <input name="name" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">性别:</label>
+                <input name="sex" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">病历提供人:</label>
+                <input name="historyProvider" class="input_width"/>
+            </div>
+            <div class="th_right">
+                <label class="label">现场地点类型:</label>
+                <input name="localAddrType" class="input_width"/>
+            </div>
+        </div>
+        <div class="tr_height">
+            <div class="th_left">
+                <label class="label">年龄:</label>
+                <input name="age" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">国籍:</label>
+                <input name="nationality" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">病历填写人:</label>
+                <input name="fillPerson" class="input_width"/>
+            </div>
+            <div class="th_right">
+                <label class="label">送往地点类型:</label>
+                <input name="sendAddrType" class="input_width"/>
+            </div>
+        </div>
+        <div class="tr_height">
+            <div class="th_left">
+                <label class="label">签名时间:</label>
+                <input name="signTime" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">救治结果:</label>
+                <input name="cureResult" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">最后修改人:</label>
+                <input name="lastAlterPerson" class="input_width"/>
+            </div>
+            <div class="th_right">
+                <label class="label">患方配合:</label>
+                <input name="patientCooperate" class="input_width"/>
+            </div>
+        </div>
+        <div class="tr_height">
+            <div class="th_left">
+                <label class="label">民族:</label>
+                <input name="folk" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">病情:</label>
+                <input name="illnessState" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">最后修改时间:</label>
+                <input name="lastAlterTime" class="input_width"/>
+            </div>
+            <div class="th_right">
+                <label class="label">呼救原因:</label>
+                <input name="alarmReason" class="input_width"/>
+            </div>
+        </div>
+        <div class="tr_height">
+            <div class="th_left">
+                <label class="label">随车医生:</label>
+                <input name="doctor" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">随车护士:</label>
+                <input name="nurse" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">填写时间:</label>
+                <input name="fillTime" class="input_width"/>
+            </div>
+            <div class="th_right">
+                <label class="label">疾病类型:</label>
+                <input name="illnessType" class="input_width"/>
+            </div>
+        </div>
+        <div class="tr_height">
+            <div class="th_left">
+                <label class="label">联系人:</label>
+                <input name="linkman" class="input_width"/>
+            </div>
+            <div class="th">
+                <label class="label">联系电话:</label>
+                <input name="linkTel" class="input_width"/>
+            </div>
+            <div style="float: right;width: 49%">
+                <label class="label">到达病人身边时间:</label>
+                <input name="arrivePatientTime" style="width: 30em"/>
+            </div>
+        </div>
+        <div class="tr_height">
+            <div class="th_left_half">
+                <label class="label">其他处理:</label>
+                <input name="treatmentOther" class="input_width_length" />
+            </div>
+            <div class="th_right_half">
+                <label class="label">处理:</label>
+                <input name="treatment" class="input_width_length" />
+            </div>
+        </div>
+
+        <div  class="tr_height">
+            <div class="th_left_half">
+                <label class="label">急救地点:</label>
+                <input name="localAddr" class="input_width_length" />
+            </div>
+            <div class="th_right_half">
+                <label class="label">主诉:</label>
+                <input name="chiefComplaint" class="input_width_length" />
+            </div>
+        </div>
+        <div  class="tr_height">
+            <div class="th_left_half">
+                <label class="label">现病史:</label>
+                <input name="presentIllness" class="input_width_length" >
+            </div>
+            <div class="th_right_half">
+                <label class="label">既往病史:</label>
+                <input name="pastIllness" class="input_width_length" />
+            </div>
+        </div>
+        <div  class="tr_height">
+            <div class="th_left_half">
+                <label class="label">过敏史:</label>
+                <input name="drugAllergyHistory" class="input_width_length"/>
+            </div>
+            <div class="th_right_half">
+                <label class="label">初步诊断:</label>
+                <input name="primaryDiagnosis" class="input_width_length" />
+            </div>
+        </div>
+        <div  class="tr_height">
+            <div class="th_left_half">
+                <label class="label">备注:</label>
+                <input name="remark" class="input_width_length"/>
+            </div>
+            <div class="th_right_half">
+                <label class="label">药物应用:</label>
+                <input name="drugUsage" class="input_width_length" />
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

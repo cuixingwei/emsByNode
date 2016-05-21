@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <script type="text/javascript">
+        var grid;
+        var exportData = function () {
+            var url = "/center/exportCarPause?startTime="
+                    + $('#startTime').datetimebox('getValue') + "&endTime="
+                    + $('#endTime').datetimebox('getValue') + "&station="
+                    + $('#station').combobox('getValue') + "&pauseReason="
+                    + $('#pauseReason').combobox('getValue') + "&carCode="
+                    + $('#carCode').combobox('getValue') + "&dispatcher="
+                    + $('#dispatcher').combobox('getValue');
+            window.location.href = url;
+        };
+        /* 初始化页面标签 */
+        function init() {
+            $('#startTime').datetimebox({
+                required: true,
+                value: firstOfMouth()
+            });
+            $('#endTime').datetimebox({
+                value: getCurrentTime()
+            })
+            $('#station').combobox({
+                url: '/dictionary/getStation',
+                valueField: 'id',
+                textField: 'name',
+                method: 'get',
+                panelHeight: 'auto',
+                editable: false,
+                onSelect: function (rec) {
+                    var url = '/dictionary/getCars?station_id=' + rec.id;
+                    $('#carCode').combobox('reload', url);
+                },
+                onLoadSuccess: function (data) {
+                    if (data.success == 'fail') {
+                        parent.$.messager.alert('提示', '你的会话已失效,请重新登陆!', 'info', function () {
+                            window.parent.location.href = "/";
+                        });
+                    } else if (data) {
+                        $('#station').combobox('setValue', data[0].id);
+                    }
+                }
+            });
+            $('#carCode').combobox({
+                url: '/dictionary/getCars',
+                valueField: 'id',
+                textField: 'plateNo',
+                method: 'get',
+                panelHeight: 'auto',
+                editable: false,
+                onLoadSuccess: function (data) {
+                    if (data) {
+                        $('#carCode').combobox('setValue', data[0].id);
+                    }
+                }
+            });
+
+            $('#pauseReason').combobox({
+                url: '/dictionary/getDictionaryByType?type=21',
+                valueField: 'id',
+                textField: 'name',
+                method: 'get',
+                panelHeight: 'auto',
+                editable: false,
+                onLoadSuccess: function (data) {
+                    if (data) {
+                        $('#pauseReason').combobox('setValue', data[0].id);
+                    }
+                }
+            });
+            $('#dispatcher').combobox({
+                url: '/dictionary/getDispatcher',
+                valueField: 'id',
+                textField: 'name',
+                method: 'get',
+                panelHeight: 'auto',
+                editable: false,
+                onLoadSuccess: function (data) {
+                    if (data.success == 'fail') {
+                        parent.$.messager.alert('提示', '你的会话已失效,请重新登陆!', 'info', function () {
+                            window.parent.location.href = "/";
+                        });
+                    } else if (data) {
+                        $('#dispatcher').combobox('setValue', data[0].id);
+                    }
+                }
+            });
+            grid = $('#grid').datagrid(
+                    {
+                        url: '/center/getCarPause',
+                        pagePosition: 'bottom',
+                        pagination: true,
+                        striped: true,
+                        singleSelect: true,
+                        rownumbers: true,
+                        idField: 'id',
+                        pageSize: 20,
+                        pageList: [10, 20, 30, 40, 50, 100, 200, 300, 400, 500],
+                        columns: [[{
+                            field: 'plateNo',
+                            title: '车辆',
+                            resizable: true,
+                            width: "13%",
+                            align: 'center'
+                        }, {
+                            field: 'driver',
+                            title: '司机',
+                            resizable: true,
+                            width: "13%",
+                            align: 'center',
+                        }, {
+                            field: 'pauseTime',
+                            title: '暂停时刻',
+                            resizable: true,
+                            width: "17%",
+                            align: 'center'
+                        }, {
+                            field: 'endTime',
+                            title: '结束时刻',
+                            resizable: true,
+                            width: "17%",
+                            align: 'center'
+                        }, {
+                            field: 'pauseTimes',
+                            title: '暂停时长',
+                            resizable: true,
+                            width: "13%",
+                            align: 'center'
+                        }, {
+                            field: 'pauseOperator',
+                            title: '暂停操作人',
+                            resizable: true,
+                            width: "13%",
+                            align: 'center'
+                        }, {
+                            field: 'pauseReason',
+                            title: '暂停原因',
+                            resizable: true,
+                            width: "13%",
+                            align: 'center'
+                        }]],
+                        toolbar: '#toolbar',
+                        onBeforeLoad: function (param) {
+                            var varify = cxw.checkStartTimeBeforeEndTime(
+                                    '#startTime', '#endTime');
+                            if (!varify) {
+                                $.messager.alert('警告', '结束时间要大于开始时间', 'warning');
+                            }
+                        }
+                    });
+        }
+
+        $(document).ready(function () {
+            init();
+            grid.datagrid('load', cxw.serializeObject($('#searchForm')));
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div id="toolbar" style="display: none;">
+    <table>
+        <tr>
+            <td>
+                <form id="searchForm">
+                    <table>
+                        <tr>
+                            <td>分站:</td>
+                            <td><input style="width: 120em;" id="station"
+                                       name="station"/></td>
+                            <td>&nbsp;车牌号码:</td>
+                            <td><input style="width: 120em;" id="carCode"
+                                       name="carCode"/></td>
+                            <td>&nbsp;暂停原因:</td>
+                            <td><input style="width: 120em;" id="pauseReason"
+                                       name="pauseReason"/></td>
+                            <td>&nbsp;调度员:</td>
+                            <td><input style="width: 120em;" id="dispatcher"
+                                       name="dispatcher"/></td>
+                        <tr>
+                            <td>查询时间:</td>
+                            <td colspan="3"><input id="startTime" name="startTime"
+                                                   style="width: 150em;"/>至<input id="endTime" name="endTime"
+                                                                                  style="width: 150em;"/></td>
+                            <td colspan="2">&nbsp;<a href="javascript:void(0);"
+                                                     class="easyui-linkbutton"
+                                                     data-options="iconCls:'ext-icon-zoom',plain:true"
+                                                     onclick=" grid.datagrid('load', cxw.serializeObject($('#searchForm')));">查询</a>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-table_go',plain:true"
+                   onclick="exportData();">导出</a></td>
+        </tr>
+    </table>
+</div>
+
+<div data-options="region:'center',fit:true,border:false">
+    <table id="grid" data-options="fit:true,border:false"></table>
+</div>
+
+</body>
+</html>

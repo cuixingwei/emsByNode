@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <script type="text/javascript">
+        var grid;
+        var exportData = function () {
+            var url = "/center/exportAccident?startTime="
+                    + $('#startTime').datetimebox('getValue') + "&endTime="
+                    + $('#endTime').datetimebox('getValue') + "&callPhone=" + $('callPhone').val() + "&eventName="
+                    + $('#eventName').val() + "&address=" + $('#address').val() + "&eventType="
+                    + $('#eventType').combobox('getValue') + "&dispatcher=" + $('#dispatcher').val();
+            window.location.href = url;
+        };
+        /* 初始化页面标签 */
+        function init() {
+            $('#startTime').datetimebox({
+                required: true,
+                value: firstOfMouth()
+            });
+            $('#endTime').datetimebox({
+                value: getCurrentTime()
+            });
+            $('#eventType').combobox({
+                url: '/dictionary/getDictionaryByType?type=14',
+                valueField: 'id',
+                textField: 'name',
+                method: 'get',
+                panelHeight: 'auto',
+                editable: false,
+                onLoadSuccess: function (data) {
+                    if (data) {
+                        $('#eventType').combobox('setValue', data[0].id);
+                    }
+                }
+            });
+
+            grid = $('#grid').datagrid(
+                    {
+                        url: '/center/getAccident',
+                        pagePosition: 'bottom',
+                        pagination: true,
+                        striped: true,
+                        singleSelect: true,
+                        rownumbers: true,
+                        idField: 'eventCode',
+                        pageSize: 20,
+                        pageList: [10, 20, 30, 40, 50, 100, 200, 300, 400, 500],
+                        columns: [[{
+                            field: 'eventName',
+                            title: '事件名称',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'firstAcceptTime',
+                            title: '时间',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'eventType',
+                            title: '事件类别',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'firstAlarmCall',
+                            title: '首次呼救电话',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'firstDisptcher',
+                            title: '调度员',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'centerName',
+                            title: '所属单位',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'localAddr',
+                            title: '事发地点',
+                            width: "14%",
+                            align: 'center'
+                        }]],
+                        toolbar: '#toolbar',
+                        onBeforeLoad: function (param) {
+                            var varify = cxw.checkStartTimeBeforeEndTime(
+                                    '#startTime', '#endTime');
+                            if (!varify) {
+                                parent.$.messager.alert('警告', '结束时间要大于开始时间', 'warning');
+                            }
+                        }
+                    });
+        }
+
+        $(document).ready(function () {
+            init();
+            grid.datagrid('load', cxw.serializeObject($('#searchForm')));
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div id="toolbar" style="display: none;">
+    <form id="searchForm">
+        <div>
+            <div style="width: 20%;display: inline-block;">
+                <label>呼救电话</label><input type="text" name="callPhone" style="width: 150px">
+            </div>
+            <div style="width: 20%;display: inline-block;">
+                <label>事件名称</label><input type="text" name="eventName" style="width: 150px">
+            </div>
+            <div style="width: 20%;display: inline-block;">
+                <label>事发地点</label><input type="text" name="address" style="width: 150px">
+            </div>
+            <div style="width: 20%;display: inline-block;">
+                <label>事件类别</label><input style="width: 150px" id="eventType" name="eventType"/></div>
+        </div>
+        <div>
+            <div style="width: 20%;display: inline-block;">
+                <label>调度员</label><input style="width: 150px" name="dispatcher"/></div>
+            <div style="width: 20%;display: inline-block;">
+                <label>开始时刻</label><input id="startTime" name="startTime" style="width: 150px;"/></div>
+            <div style="width: 20%;display: inline-block;">
+                <label>结束时刻</label><input id="endTime" name="endTime" style="width: 150px;"/></div>
+            <div style="width: 20%;display: inline-block;">
+                <a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-zoom',plain:true"
+                   onclick=" grid.datagrid('load', cxw.serializeObject($('#searchForm')));">查询</a>
+            </div>
+        </div>
+        <div>
+            <div class="th"><a href="javascript:void(0);" class="easyui-linkbutton"
+                               data-options="iconCls:'ext-icon-table_go',plain:true"
+                               onclick="exportData();">导出</a></div>
+        </div>
+    </form>
+</div>
+
+<div data-options="region:'center',fit:true,border:false">
+    <table id="grid" data-options="fit:true,border:false"></table>
+</div>
+</body>
+</html>

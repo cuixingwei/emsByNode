@@ -1,0 +1,52 @@
+@CHARSET "UTF-8";
+.hBgG {
+    background: #44ACFB
+}
+
+.leftBgG {
+    height: 69px;
+    width: 543px;
+    background: url("../images/top_left.png") no-repeat;
+    float: left;
+}
+
+.hTopRight {
+    width: 540px;
+    height: 69px;
+    background: url("../images/top_right.png") bottom right no-repeat;
+    float: right;
+}
+
+.htopBgG {
+    height: 38px;
+    float: left;
+    background: url("../images/topmid_bg.png") repeat-x;
+}
+
+.hleftBotom {
+    background: url("../images/topmid_left.png") no-repeat;
+    height: 38px;
+    width: 150px;
+    float: left;
+    display: inline;
+}
+
+.hleftRight {
+    background: url("../images/topmid_right.png") right no-repeat;
+    height: 38px;
+    width: 125;
+    float: right;
+}
+
+.secMenu {
+    line-height: 25px;
+    height: 25px;
+    padding-left: 10px
+}
+
+.secMenu a:hover {
+    cursor: pointer;
+    font-size: 120%;
+    background-color: #E3EAF7;
+    border: 2px;
+}

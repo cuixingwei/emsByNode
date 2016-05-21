@@ -1,0 +1,9 @@
+{
+  "HOST": "121.43.154.211",
+  "PORT": 3306,
+  "USER": "root",
+  "PASSWORD": "super120",
+  "DATABASE": "test120",
+  "CONNECT": 16,
+  "charset": "utf8"
+}

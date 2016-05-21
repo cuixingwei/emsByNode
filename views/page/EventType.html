@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <script type="text/javascript">
+        var grid;
+        var exportData = function () {
+            var url = "/center/exportEventType?startTime="
+                    + $('#startTime').datetimebox('getValue') + "&endTime="
+                    + $('#endTime').datetimebox('getValue');
+            window.location.href = url;
+        };
+        /* 初始化页面标签 */
+        function init() {
+            $('#startTime').datetimebox({
+                required: true,
+                value: firstOfMouth()
+            });
+            $('#endTime').datetimebox({
+                value: getCurrentTime()
+            })
+            grid = $('#grid').datagrid(
+                    {
+                        url: '/center/getEventType',
+                        pagePosition: 'bottom',
+                        pagination: true,
+                        striped: true,
+                        singleSelect: true,
+                        rownumbers: true,
+                        idField: 'dispatcher',
+                        pageSize: 20,
+                        pageList: [10, 20, 30, 40, 50, 100, 200, 300, 400, 500],
+                        columns: [[{
+                            field: 'eventName',
+                            title: '事件名称',
+                            width: "17%",
+                            align: 'center'
+                        }, {
+                            field: 'firstAlarmCall',
+                            title: '首次呼救电话',
+                            width: "17%",
+                            align: 'center'
+                        }, {
+                            field: 'username',
+                            title: '首次调度员',
+                            width: "14%",
+                            align: 'center'
+                        }, {
+                            field: 'firstAcceptTime',
+                            title: '首次受理时间',
+                            width: "17%",
+                            align: 'center'
+                        }, {
+                            field: 'acceptCount',
+                            title: '受理次数',
+                            width: "17%",
+                            align: 'center'
+                        }, {
+                            field: 'eventType',
+                            title: '事件类型',
+                            width: "14%",
+                            align: 'center'
+                        }]],
+                        toolbar: '#toolbar',
+                        onBeforeLoad: function (param) {
+                            var varify = cxw.checkStartTimeBeforeEndTime(
+                                    '#startTime', '#endTime');
+                            if (!varify) {
+                                parent.$.messager.alert('警告', '结束时间要大于开始时间', 'warning');
+                            }
+                        }
+                    });
+        }
+
+        $(document).ready(function () {
+            init();
+            grid.datagrid('load', cxw.serializeObject($('#searchForm')));
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div id="toolbar" style="display: none;">
+    <table>
+        <tr>
+            <td>
+                <form id="searchForm">
+                    <table>
+                        <tr>
+                            <td>查询时间</td>
+                            <td><input id="startTime" name="startTime"
+                                       style="width: 150em;"/>至<input id="endTime" name="endTime"
+                                                                      style="width: 150em;"/></td>
+                            <td><a href="javascript:void(0);" class="easyui-linkbutton"
+                                   data-options="iconCls:'ext-icon-zoom',plain:true"
+                                   onclick=" grid.datagrid('load', cxw.serializeObject($('#searchForm')));">查询</a></td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-table_go',plain:true"
+                   onclick="exportData();">导出</a></td>
+        </tr>
+    </table>
+</div>
+
+<div data-options="region:'center',fit:true,border:false">
+    <table id="grid" data-options="fit:true,border:false"></table>
+</div>
+
+</body>
+</html>

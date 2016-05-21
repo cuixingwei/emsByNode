@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <script type="text/javascript">
+        var grid;
+        var exportData = function () {
+            var url = "/center/exportDriverWork?startTime="
+                    + $('#startTime').datetimebox('getValue') + "&endTime="
+                    + $('#endTime').datetimebox('getValue');
+            window.location.href = url;
+        };
+        /* 初始化页面标签 */
+        function init() {
+            $('#startTime').datetimebox({
+                required: true,
+                value: firstOfMouth()
+            });
+            $('#endTime').datetimebox({
+                value: getCurrentTime()
+            })
+
+            grid = $('#grid').datagrid(
+                    {
+                        url: '/center/getDriverWork',
+                        pagePosition: 'bottom',
+                        pagination: true,
+                        striped: true,
+                        singleSelect: true,
+                        rownumbers: true,
+                        idField: 'id',
+                        pageSize: 20,
+                        pageList: [10, 20, 30, 40, 50, 100, 200, 300, 400, 500],
+                        columns: [[{
+                            field: 'driver',
+                            title: '司机',
+                            resizable: true,
+                            width: "15%",
+                            align: 'center',
+                        }, {
+                            field: 'outCarNumbers',
+                            title: '出车次数',
+                            resizable: true,
+                            width: "15%",
+                            align: 'center'
+                        }, {
+                            field: 'nomalNumbers',
+                            title: '正常完成次数',
+                            resizable: true,
+                            width: "18%",
+                            align: 'center'
+                        }, {
+                            field: 'stopNumbers',
+                            title: '中止数',
+                            resizable: true,
+                            width: "15%",
+                            align: 'center'
+                        }, {
+                            field: 'averageOutCarTimes',
+                            title: '平均出车时间',
+                            resizable: true,
+                            width: "18%",
+                            align: 'center'
+                        }, {
+                            field: 'averageArriveSpotTimes',
+                            title: '平均到达时间',
+                            resizable: true,
+                            width: "18%",
+                            align: 'center',
+                        }]],
+                        toolbar: '#toolbar',
+                        onBeforeLoad: function (param) {
+                            var varify = cxw.checkStartTimeBeforeEndTime(
+                                    '#startTime', '#endTime');
+                            if (!varify) {
+                                parent.$.messager.alert('警告', '结束时间要大于开始时间', 'warning');
+                            }
+                        },
+                        onLoadSuccess: function (data) {
+                            $(this).datagrid("autoMergeCells", ['station']);
+                        }
+                    });
+        }
+
+        $(document).ready(function () {
+            init();
+            grid.datagrid('load', cxw.serializeObject($('#searchForm')));
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<div id="toolbar" style="display: none;">
+    <table>
+        <tr>
+            <td>
+                <form id="searchForm">
+                    <table>
+                        <tr>
+                            <td>查询时间:</td>
+                            <td colspan="3"><input id="startTime" name="startTime"
+                                                   style="width: 150em;"/>至<input id="endTime" name="endTime"
+                                                                                  style="width: 150em;"/></td>
+                            <td colspan="2">&nbsp;<a href="javascript:void(0);"
+                                                     class="easyui-linkbutton"
+                                                     data-options="iconCls:'ext-icon-zoom',plain:true"
+                                                     onclick=" grid.datagrid('load', cxw.serializeObject($('#searchForm')));">查询</a>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-table_go',plain:true"
+                   onclick="exportData();">导出</a></td>
+        </tr>
+    </table>
+</div>
+
+<div data-options="region:'center',fit:true,border:false">
+    <table id="grid" data-options="fit:true,border:false"></table>
+</div>
+
+</body>
+</html>
