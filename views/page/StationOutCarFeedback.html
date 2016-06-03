@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+        }
+
+        table td {
+            border: 1px solid #000000;
+            text-align: center;
+        }
+
+        table th {
+            border: 1px solid #000000;
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        var printData = function (oper) {
+            if (oper < 10) {
+                bdhtml = window.document.body.innerHTML;//获取当前页的html代码
+                sprnstr = "<!--startprint" + oper + "-->";//设置打印开始区域
+                eprnstr = "<!--endprint" + oper + "-->";//设置打印结束区域
+                prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //从开始代码向后取html
+
+                prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));//从结束代码向前取html
+                prnhtml = '<style type="text/css"> table {  border-collapse: collapse;   }   table td {  border: 1px solid #000000;  text-align: center; font-size: 10px }      table th {     border: 1px solid #000000;   text-align: center;   }   </style>' + prnhtml;
+
+                // 生成并打印ifrme
+                var syfPrint = window.frames[0];
+                syfPrint.document.body.innerHTML = prnhtml;
+                syfPrint.document.execCommand("Print");
+            }
+            else {
+                window.print();
+            }
+        };
+
+
+        /* 初始化页面标签 */
+        function init() {
+            $("#printTimeSpan").html(getCurrentTime());
+            $("#startTimeSpan").html(firstOfMouth());
+            $("#endTimeSpan").html(GetDateMonthStr(1));
+            $("#startTimeSpan2").html(GetDateMonthStr(-1));
+            $("#endTimeSpan2").html(firstOfMouth());
+            $("#time1").val(GetDateMonthStr(-1));
+            $("#time2").val(firstOfMouth());
+            $("#time3").val(GetDateMonthStr(1));
+        }
+
+        /*查询操作*/
+        var query = function () {
+            $.messager.progress({
+                text: '数据加载中....'
+            });
+            $("#printTimeSpan").html(getCurrentTime());
+            var value = $("#station").val();
+            if (value == '1') {
+                $("#caption").html('中心医院急救站出车情况月反馈表');
+            } else if (value == '2') {
+                $("#caption").html('鄂钢医院急救站出车情况月反馈表');
+            } else {
+                $("#caption").html('二医院急救站出车情况月反馈表');
+            }
+            $.post("/center/getStationOutCarFeedback", cxw.serializeObject($('#searchForm')), function (result, status) {
+                if (status == 'success') {
+                    $.messager.progress('close');
+                    var str = '';
+                    $.each(result.result1, function (i, ob) {//填充表1数据
+                        str += '<tr><td>' + ob.project + '</td><td>' + ob.outCars + '</td><td>' + ob.noPass + '</td><td>' + ob.pass2 + '</td><td>' + ob.pass3 + '</td><td>' + ob.pass4 + '</td><td>'
+                                + ob.pass5 + '</td><td>' + ob.pass10 + '</td><td>' + ob.total + '</td><td>' + ob.ratio + '</td></tr>';
+                    });
+                    $("#table1 tbody").empty().append(str);
+                    str = '';
+                    $.each(result.result2, function (i, ob) { //填充表2数据
+                        str += '<tr><td>' + ob.project + '</td><td>' + ob.outCars + '</td><td>' + ob.noPass + '</td><td>' + ob.pass2 + '</td><td>' + ob.pass3 + '</td><td>' + ob.pass4 + '</td><td>'
+                                + ob.pass5 + '</td><td>' + ob.pass10 + '</td><td>' + ob.total + '</td><td>' + ob.ratio + '</td></tr>';
+                    });
+                    $("#table2 tbody").empty().append(str);
+                } else {
+                    $.messager.progress('close');
+                    $.messager.alert('提示', '查询失败!', 'info');
+                }
+            });
+        };
+
+        $(document).ready(function () {
+            init();
+            query();
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<iframe src="" width="0" height="0" frameborder="0"></iframe>
+<div data-options="region:'north',title:'查询条件',split:true" style="height:80px;">
+    <form id="searchForm">
+        <div style="padding: 10px;">
+            <div style="width: 24%;float: left;display: inline-block;">
+                <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">分站:</label>
+                <select name="station" id="station">
+                    <option value="1">中心医院</option>
+                    <option value="2">鄂钢医院</option>
+                    <option value="3">二医院</option>
+                </select>
+            </div>
+            <div style="width: 15%;display: inline-block;">
+                <a href="javascript:void(0);" class="easyui-linkbutton"
+                   style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
+                   data-options="iconCls:'ext-icon-zoom',plain:true"
+                   onclick="query();">查询</a>
+            </div>
+            <div style="width: 15%;display: inline-block;">
+                <a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-printer',plain:true"
+                   onclick="printData(1);">打印</a>
+            </div>
+        </div>
+        <input type="hidden" name="time1" id="time1">
+        <input type="hidden" name="time2" id="time2">
+        <input type="hidden" name="time3" id="time3">
+    </form>
+</div>
+<div data-options="region:'center',border:false">
+    <!--startprint1-->
+    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0" align="center"
+           style="table-layout:fixed;">
+        <caption style="font-size:20px;"><b id="caption">中心医院急救站出车情况月反馈表</b></caption>
+        <thead>
+        <tr>
+            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+                <span>开始时间:</span>
+                <span id="startTimeSpan"></span>
+            </td>
+            <td colspan="4" style="border:none;font-size: 10px;">
+                <span>结束时间:</span>
+                <span id="endTimeSpan"></span>
+            </td>
+            <td colspan="3" style="border:none;font-size: 10px;text-align: right">
+                <span>打印时间:</span>
+                <span id="printTimeSpan"></span>
+            </td>
+        </tr>
+        <tr>
+            <th rowspan="2">时间\车次</th>
+            <th rowspan="2">出车数</th>
+            <th rowspan="2">未超时</th>
+            <th colspan="7">超时情况统计</th>
+        </tr>
+        <tr>
+            <th>超过2分钟</th>
+            <th>超过3分钟</th>
+            <th>超过4分钟</th>
+            <th>超过5分钟</th>
+            <th>超过10分钟</th>
+            <th>合计</th>
+            <th>所占比例</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <table id="table2" width="99%" cellpadding="0" cellspacing="0" align="center" border="0"
+           style="margin-top: 10px;table-layout:fixed;">
+        <thead>
+        <tr>
+            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+                <span>开始时间:</span>
+                <span id="startTimeSpan2"></span>
+            </td>
+            <td colspan="4" style="border:none;font-size: 10px;">
+                <span>结束时间:</span>
+                <span id="endTimeSpan2"></span>
+            </td>
+        </tr>
+        <tr>
+            <th rowspan="2">时间\车次</th>
+            <th rowspan="2">出车数</th>
+            <th rowspan="2">未超时</th>
+            <th colspan="7">超时情况统计</th>
+        </tr>
+        <tr>
+            <th>超过2分钟</th>
+            <th>超过3分钟</th>
+            <th>超过4分钟</th>
+            <th>超过5分钟</th>
+            <th>超过10分钟</th>
+            <th>合计</th>
+            <th>所占比例</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <!--endprint1-->
+</div>
+</body>
+</html>

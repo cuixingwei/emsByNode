@@ -12,7 +12,6 @@ exports.formatSecond = function (second) {
         var hours = Math.floor(second / (60 * 60));
         var minutes = Math.floor(second / 60) - hours * 60;
         var seconds = second - minutes * 60 - hours * 60 * 60;
-        console.log("hours:" + hours + ";minutes:" + minutes + ";seconds:" + seconds);
         if (hours > 0) {
             ss = hours + '时' + minutes + '分' + seconds + '秒';
         } else if (minutes > 0) {
@@ -22,7 +21,7 @@ exports.formatSecond = function (second) {
         }
     }
     return ss;
-}
+};
 /**
  * 计算百分比
  * @param total
@@ -30,11 +29,10 @@ exports.formatSecond = function (second) {
  * @returns {string}
  */
 exports.calculateRate = function (total, portion) {
-    if (isNaN(total)) {
-        total = 0;
+    portion = parseFloat(portion);
+    total = parseFloat(total);
+    if (isNaN(portion) || isNaN(total)) {
+        return "-";
     }
-    if (isNaN(portion)) {
-        portion = 0;
-    }
-    return (Math.round(portion / total * 10000) / 100.00 + "%");// 小数点后两位百分比
-}
+    return total <= 0 ? "0%" : (Math.round(portion / total * 10000) / 100.00 + "%");// 小数点后两位百分比
+};

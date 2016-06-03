@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <% include ../head.html %>
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+        }
+
+        table td {
+            border: 1px solid #000000;
+            text-align: center;
+        }
+
+        table th {
+            border: 1px solid #000000;
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        var printData = function (oper) {
+            if (oper < 10) {
+                bdhtml = window.document.body.innerHTML;//获取当前页的html代码
+                sprnstr = "<!--startprint" + oper + "-->";//设置打印开始区域
+                eprnstr = "<!--endprint" + oper + "-->";//设置打印结束区域
+                prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //从开始代码向后取html
+
+                prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));//从结束代码向前取html
+                prnhtml = '<style type="text/css"> table {  border-collapse: collapse;   }   table td {  border: 1px solid #000000;  text-align: center; font-size: 10px }      table th {     border: 1px solid #000000;   text-align: center;   }   </style>' + prnhtml;
+
+                // 生成并打印ifrme
+                var syfPrint = window.frames[0];
+                syfPrint.document.body.innerHTML = prnhtml;
+                syfPrint.document.execCommand("Print");
+            }
+            else {
+                window.print();
+            }
+        };
+
+
+        /* 初始化页面标签 */
+        function init() {
+            $('#startTime').datetimebox({
+                required: true,
+                editable: false,
+                value: GetDateMonthStr(0)
+            });
+            $('#endTime').datetimebox({
+                value: GetDateMonthStr(1),
+                editable: false
+            });
+            $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
+            $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+            $("#printTimeSpan").html(getCurrentTime());
+        }
+
+        /*查询操作*/
+        var query = function () {
+            $.messager.progress({
+                text: '数据加载中....'
+            });
+            $("#printTimeSpan").html(getCurrentTime());
+            $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
+            $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+            $.post("/center/getCarOutStatistics", cxw.serializeObject($('#searchForm')), function (result, status) {
+                if (status == 'success') {
+                    $.messager.progress('close');
+                    var map = [];
+                    var sub = [];
+                    $.each(result, function (i, ob) {
+                        var columnValue = ob.station;
+                        var columnSubValue = ob.station + ob.driver;
+                        if (!map[columnValue]) {
+                            map[columnValue] = 1;
+                        } else {
+                            map[columnValue] = parseInt(map[columnValue]) + 1;
+                        }
+                        if (!sub[columnSubValue]) {
+                            sub[columnSubValue] = 1;
+                        } else {
+                            sub[columnSubValue] = parseInt(sub[columnSubValue]) + 1;
+                        }
+                    });
+                    var str = '';
+                    var columnValue;
+                    var columnSubValue;
+                    console.log(map);
+                    console.log(sub);
+                    $.each(result, function (i, ob) {//填充表1数据
+                        if (ob.station == '总计') {
+                            str += '<tr><td colspan="4"><b>' + ob.station + '</b></td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                        } else if (ob.station == '合计') {
+                            str += '<tr><td colspan="1"><b>' + ob.station + '</b></td><td></td><td></td><td></td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                        } else if (columnValue != ob.station) { //分站第一行
+                            columnValue = ob.station;
+                            if (columnSubValue != (ob.station + ob.driver) && ob.driver != '小计') {//分站第一行
+                                columnSubValue = ob.station + ob.driver;
+                                str += '<tr><td rowspan="' + map[ob.station] + '">' + ob.station + '</td><td rowspan="' + sub[columnSubValue] + '">' + ob.driver + '</td><td>' + ob.carIdentification + '</td><td>' + ob.carNo + '</td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                            } else if (ob.driver == '小计') {
+                                str += '<tr><td colspan="1"><b>' + ob.driver + '</b></td><td>' + ob.carIdentification + '</td><td>' + ob.carNo + '</td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                            } else {
+                                str += '<tr><td rowspan="' + map[ob.station] + '">' + ob.station + '</td><td>' + ob.driver + '</td><td>' + ob.carIdentification + '</td><td>' + ob.carNo + '</td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                            }
+                        } else {
+                            if (ob.driver == '小计') {
+                                str += '<tr><td colspan="1"><b>' + ob.driver + '</b></td><td>' + ob.carIdentification + '</td><td>' + ob.carNo + '</td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                            } else if (columnSubValue != (ob.station + ob.driver)) {//分站第一行
+                                columnSubValue = ob.station + ob.driver;
+                                str += '<tr><td rowspan="' + sub[columnSubValue] + '">' + ob.driver + '</td><td>' + ob.carIdentification + '</td><td>' + ob.carNo + '</td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                            } else {
+                                str += '<tr><td>' + ob.carIdentification + '</td><td>' + ob.carNo + '</td><td>' + ob.num1 + '</td><td>' + ob.num2 + '</td><td>' + ob.num3 + '</td><td>' + ob.num4 + '</td><td>' + ob.num5 + '</td><td>' + ob.num6 + '</td></tr>';
+                            }
+                        }
+                    });
+                    $("#table1 tbody").empty().append(str);
+                } else {
+                    $.messager.progress('close');
+                    $.messager.alert('提示', '查询失败!', 'info');
+                }
+
+            });
+        };
+
+        $(document).ready(function () {
+            init();
+            query();
+        });
+    </script>
+</head>
+<body class="easyui-layout" data-options="fit:true,border:false">
+<iframe src="" width="0" height="0" frameborder="0"></iframe>
+<div data-options="region:'north',title:'查询条件',split:true" style="height:80px;">
+    <form id="searchForm">
+        <div style="padding: 10px;">
+            <div style="width: 24%;float: left;display: inline-block;">
+                <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">开始时刻:</label>
+                <input id="startTime" name="startTime" style="width: 150px;"/>
+            </div>
+            <div style="width: 24%;display: inline-block;">
+                <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">结束时刻:</label>
+                <input id="endTime" name="endTime" style="width: 150px;"/>
+            </div>
+            <div style="width: 24%;display: inline-block;">
+                <a href="javascript:void(0);" class="easyui-linkbutton"
+                   style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
+                   data-options="iconCls:'ext-icon-zoom',plain:true"
+                   onclick="query();">查询</a>
+            </div>
+            <div style="width: 24%;display: inline-block;float: right;">
+                <a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-printer',plain:true"
+                   onclick="printData(1);">打印</a>
+            </div>
+        </div>
+    </form>
+</div>
+<div data-options="region:'center',border:false">
+    <!--startprint1-->
+    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0" align="center" style="">
+        <caption style="font-size:20px;"><b id="caption">车辆出车情况统计表</b></caption>
+        <thead>
+        <tr>
+            <td style="border:none;font-size: 10px;text-align: left;" colspan="4">
+                <span>开始时间:</span>
+                <span id="startTimeSpan"></span>
+            </td>
+            <td style="border:none;font-size: 10px;" colspan="3">
+                <span>结束时间:</span>
+                <span id="endTimeSpan"></span>
+            </td>
+            <td style="border:none;font-size: 10px;text-align: right" colspan="3">
+                <span>打印时间:</span>
+                <span id="printTimeSpan"></span>
+            </td>
+        </tr>
+        <tr>
+            <th>急救站</th>
+            <th>司机</th>
+            <th>实际标识</th>
+            <th>车辆牌照</th>
+            <th>白班出车</th>
+            <th>夜班出车</th>
+            <th>白班有效出车</th>
+            <th>夜班有效出车</th>
+            <th>出车小计</th>
+            <th>有效出车小计</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <!--endprint1-->
+</div>
+</body>
+</html>

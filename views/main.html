@@ -47,6 +47,34 @@
         setInterval(show, 500);
 
         $(document).ready(function () {
+            /* 修改密码 */
+            $('#passwordDialog').show().dialog({
+                modal: true,
+                closable: true,
+                iconCls: 'ext-icon-lock_edit',
+                buttons: [{
+                    text: '修改',
+                    handler: function () {
+                        if ($('#passwordDialog form').form('validate')) {
+                            $.post('changePwd', {
+                                'dataPwd': $('#pwd').val()
+                            }, function (result) {
+                                if (result.success) {
+                                    $.messager.alert('提示', '密码修改成功！', 'info');
+                                    $('#passwordDialog').dialog('close');
+                                } else {
+                                    $.messager.alert('提示', '密码修改失败！', 'info');
+                                    $('#passwordDialog').dialog('close');
+                                }
+                            }, 'json');
+                        }
+                    }
+                }],
+                onOpen: function () {
+                    $('#passwordDialog form :input').val('');
+                }
+            }).dialog('close');
+
             var titleArray = new Array();
             $.get("/menu", function (data) {
                 $.each(data, function (i, m) {
@@ -174,7 +202,7 @@
         </div>
 
 	    <span id="a"
-          style="color: #FF0000; float: left; width: 600px; height: 25px; margin-top: 10px; margin-left: 10px; display: inline-block;"></span>
+              style="color: #FF0000; float: left; width: 600px; height: 25px; margin-top: 10px; margin-left: 10px; display: inline-block;"></span>
 
         <div class="hleftRight"></div>
 
@@ -193,19 +221,35 @@
     </div>
 </div>
 <!--左侧菜单导航栏-->
-<div data-options="region:'west',title:'导航',split:true" style="width:190px;">
+<div data-options="region:'west',title:'导航',split:true" style="width:240px;">
     <div id="menu_left" class="easyui-accordion" data-options="fit:true">
     </div>
 </div>
 <!--中间内容呈现区-->
 <div data-options="region:'center'" style="padding:5px;background:#eee;">
     <div id="mainTabs">
-        <div title="振铃到接听大于X秒"
+        <div title="1.1 业务工作情况日报表"
              data-options="iconCls:'ext-icon-page',closable:true,fit:true">
-            <iframe src="/RingToAnswerTimes"
+            <iframe src="/BusinessWorkDay"
                     style="border: 0; width: 99.9%; height: 99%;"></iframe>
         </div>
     </div>
+</div>
+<div id="passwordDialog" title="修改密码" style="display: none;">
+    <form method="post" class="form" onsubmit="return false;">
+        <table class="table">
+            <tr>
+                <th>新密码</th>
+                <td><input id="pwd" name="dataPwd" type="password"
+                           class="easyui-validatebox" data-options="required:true"/></td>
+            </tr>
+            <tr>
+                <th>重复密码</th>
+                <td><input type="password" class="easyui-validatebox"
+                           data-options="required:true,validType:'eqPwd[\'#pwd\']'"/></td>
+            </tr>
+        </table>
+    </form>
 </div>
 </body>
 </html>

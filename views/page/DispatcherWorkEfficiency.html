@@ -63,18 +63,18 @@
             $("#printTimeSpan").html(getCurrentTime());
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
-            $.post("/center/getDispatcherWorkload", cxw.serializeObject($('#searchForm')), function (result, status) {
+            $.post("/center/getDispatcherWorkEfficiency", cxw.serializeObject($('#searchForm')), function (result, status) {
                 if (status == 'success') {
                     $.messager.progress('close');
                     var str = '';
                     if (result.length > 0) {
                         $.each(result, function (i, ob) {//填充表1数据
                             if (ob.userId == '合计') {
-                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
+                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.validSendCars + '</td><td>' + ob.avgOffhook + '</td><td>'
+                                        + ob.avgAcceptTime + '</td><td>' + ob.acceptTimeLess1 + '</td><td>' + ob.acceptTimeLess1Ratio + '</td><td>' + ob.acceptTimeMore1 + '</td><td>' + ob.acceptTimeMore1Ratio + '</td></tr>';
                             } else {
-                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
+                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.validSendCars + '</td><td>' + ob.avgOffhook + '</td><td>'
+                                        + ob.avgAcceptTime + '</td><td>' + ob.acceptTimeLess1 + '</td><td>' + ob.acceptTimeLess1Ratio + '</td><td>' + ob.acceptTimeMore1 + '</td><td>' + ob.acceptTimeMore1Ratio + '</td></tr>';
                             }
                         });
                     }
@@ -123,10 +123,10 @@
 <div data-options="region:'center',border:false">
     <!--startprint1-->
     <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
-        <caption style="font-size:20px;"><b>调度员工作量统计</b></caption>
+        <caption style="font-size:20px;"><b>调度员工作效率统计</b></caption>
         <thead>
         <tr>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td colspan="4" style="border:none;font-size: 10px;text-align: left">
                 <span>开始时间:</span>
                 <span id="startTimeSpan"></span>
             </td>
@@ -134,7 +134,7 @@
                 <span>结束时间:</span>
                 <span id="endTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: right">
+            <td colspan="2" style="border:none;font-size: 10px;text-align: right">
                 <span>打印时间:</span>
                 <span id="printTimeSpan"></span>
             </td>
@@ -142,13 +142,13 @@
         <tr>
             <th>调度员工号</th>
             <th>调度员姓名</th>
-            <th>接电话数</th>
-            <th>受理数</th>
-            <th>有效受理数</th>
-            <th>110受理数</th>
+            <th>有效派车数</th>
+            <th>平均摘机时间</th>
             <th>平均受理时间</th>
-            <th>平均派车时间</th>
-            <th>受理比例</th>
+            <th>受理时间小于等于1分钟</th>
+            <th>受理时间小于等于1分钟百分比</th>
+            <th>受理时间大于1分钟</th>
+            <th>受理时间大于1分钟百分比</th>
         </tr>
         </thead>
         <tbody>

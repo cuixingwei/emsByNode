@@ -63,21 +63,18 @@
             $("#printTimeSpan").html(getCurrentTime());
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
-            $.post("/center/getDispatcherWorkload", cxw.serializeObject($('#searchForm')), function (result, status) {
+            $.post("/center/getHookTimeFlow", cxw.serializeObject($('#searchForm')), function (result, status) {
                 if (status == 'success') {
                     $.messager.progress('close');
                     var str = '';
                     if (result.length > 0) {
                         $.each(result, function (i, ob) {//填充表1数据
-                            if (ob.userId == '合计') {
-                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            } else {
-                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            }
+                            str += '<tr><td>' + ob.project + '</td><td>' + ob.alarmPhone + '</td><td>' + ob.produceTime + '</td><td>' + ob.tableNo + '</td><td>'
+                                    + ob.dispatcher + '</td><td>' + ob.ringTime + '</td><td>' + ob.startTime + '</td><td>' + ob.endTime + '</td><td>' + ob.hungDuration + '</td><td>'
+                                    + ob.result + '</td></tr>';
                         });
                     }
+                    str += '<tr><td style="text-align: center" colspan="10">共' + result.length + '条记录</td></tr>';
                     $("#table1 tbody").empty().append(str);
                 } else {
                     $.messager.progress('close');
@@ -123,14 +120,14 @@
 <div data-options="region:'center',border:false">
     <!--startprint1-->
     <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
-        <caption style="font-size:20px;"><b>调度员工作量统计</b></caption>
+        <caption style="font-size:20px;"><b>摘机时长流水表</b></caption>
         <thead>
         <tr>
             <td colspan="3" style="border:none;font-size: 10px;text-align: left">
                 <span>开始时间:</span>
                 <span id="startTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td colspan="4" style="border:none;font-size: 10px;text-align: left">
                 <span>结束时间:</span>
                 <span id="endTimeSpan"></span>
             </td>
@@ -140,15 +137,16 @@
             </td>
         </tr>
         <tr>
-            <th>调度员工号</th>
-            <th>调度员姓名</th>
-            <th>接电话数</th>
-            <th>受理数</th>
-            <th>有效受理数</th>
-            <th>110受理数</th>
-            <th>平均受理时间</th>
-            <th>平均派车时间</th>
-            <th>受理比例</th>
+            <th>名称</th>
+            <th>呼入电话</th>
+            <th>产生时刻</th>
+            <th>台号</th>
+            <th>姓名</th>
+            <th>震铃时刻</th>
+            <th>通话时刻</th>
+            <th>结束时刻</th>
+            <th>摘机时长</th>
+            <th>结果</th>
         </tr>
         </thead>
         <tbody>

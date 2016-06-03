@@ -10,62 +10,62 @@
   {
     "attributes": {
       "target": "",
-      "url": "/RingToAnswerTimes"
+      "url": "/BusinessWorkDay"
     },
     "iconCls": "ext-icon-world",
     "id": "00",
     "pid": "0",
-    "text": "振铃到接听大于X秒"
+    "text": "1.1 业务工作情况日报表"
   },
   {
     "attributes": {
       "target": "",
-      "url": "/AcceptStartToEndTime"
+      "url": "/BusinessWorkMonth"
     },
     "iconCls": "ext-icon-world",
-    "id": "01",
+    "id": "00",
     "pid": "0",
-    "text": "受理时长大于X秒"
+    "text": "1.2 业务工作情况月季年"
   },
   {
     "attributes": {
       "target": "",
-      "url": "/talkTime"
+      "url": "/CenterDay1"
     },
     "iconCls": "ext-icon-world",
-    "id": "02",
+    "id": "00",
     "pid": "0",
-    "text": "通话时长大于X秒"
+    "text": "2 日报表1"
   },
   {
     "attributes": {
       "target": "",
-      "url": "/EventType"
+      "url": "/CenterDay2"
     },
     "iconCls": "ext-icon-world",
-    "id": "03",
+    "id": "00",
     "pid": "0",
-    "text": "事件类型统计"
+    "text": "3 日报表2"
   },
   {
     "attributes": {
       "target": "",
-      "url": "/AcceptTime"
+      "url": "/EventTypeFlow"
     },
     "iconCls": "ext-icon-world",
-    "id": "04",
+    "id": "00",
     "pid": "0",
-    "text": "受理时间统计"
+    "text": "4 社会急救保障流水表"
   },
   {
     "attributes": {
       "target": "",
-      "url": "/CallHistory"
+      "url": "/EventSafeOrEmergencyFlow"
     },
     "iconCls": "ext-icon-world",
-    "id": "05",
+    "id": "00",
     "pid": "0",
-    "text": "呼救历史查询"
+    "text": "5 医疗保障、应急演练流水表"
   },
   {
     "attributes": {
@@ -73,9 +73,239 @@
       "url": "/Accident"
     },
     "iconCls": "ext-icon-world",
-    "id": "06",
+    "id": "00",
     "pid": "0",
-    "text": "重大紧急事件情况统计"
+    "text": "6 突发公卫事件"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/GsStationOutCar"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "7 高速站出车"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/StationOutCar"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "8 急救站出车情况表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/StationOutCarFeedback"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "9 三家医院出车反馈"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/ThreeStationOutCar"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "10 三家医院月季年出车"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/CenterFourStationOutCar"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "11 中心医院四分站月季年"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/StationTransfer"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "12 网内转送月季年"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/NoAreaFlow"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "13 未按辖区流水表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/NoAreaStatistics"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "14 未按辖区月季年"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/TwentyFourAccept"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "17 24小时受理情况统计"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/PhoneJudgeDiseaseClass"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "18 电话判断疾病分类表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/PatientFlowDirection"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "19 紧急救援中心病员流向表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/PatientFlowDirectionStatistics"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "20 紧急救援中心病员流向情况统计表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/AreaPatientClassFlow"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "21 呼救区域病种分类流水表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/AreaPatientClassFlowStatistics"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "22 呼救区域统计表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/CarOutStatistics"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "23 车辆出车情况统计表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/StationOutCarReactionSpeed"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "24 急救站出车反应速度统计表New"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/DriverOutCarReactionSpeed"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "25 司机出车反应速度统计表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/PauseFlow"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "26 暂停调用流水表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/PauseStatistics"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "27 暂停调用统计表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/HungEventFlow"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "28 挂起流水表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/HungEventHandle"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "29 待派处理情况统计表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/HookTimeFlow"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "30 摘机时长流水表"
+  },
+  {
+    "attributes": {
+      "target": "",
+      "url": "/HookSpeedStatistics"
+    },
+    "iconCls": "ext-icon-world",
+    "id": "00",
+    "pid": "0",
+    "text": "31 受理人员摘机速度统计报表"
   },
   {
     "attributes": {
@@ -83,137 +313,19 @@
       "url": "/DispatcherWorkload"
     },
     "iconCls": "ext-icon-world",
-    "id": "07",
+    "id": "00",
     "pid": "0",
-    "text": "调度员工作统计"
-  },
+    "text": "32 调度员工作量统计"
+  }
+,
   {
     "attributes": {
       "target": "",
-      "url": "/OutCarRecord"
+      "url": "/DispatcherWorkEfficiency"
     },
     "iconCls": "ext-icon-world",
-    "id": "08",
+    "id": "00",
     "pid": "0",
-    "text": "出车记录表"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/StopTask"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "09",
-    "pid": "0",
-    "text": "中止任务信息统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/StopTaskReason"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "010",
-    "pid": "0",
-    "text": "中止任务原因统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/CarPause"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "011",
-    "pid": "0",
-    "text": "车辆暂停调用情况"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/HungEvent"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "012",
-    "pid": "0",
-    "text": "挂起事件流水统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/HungEventReason"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "013",
-    "pid": "0",
-    "text": "挂起原因统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/AnswerAlarm"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "014",
-    "pid": "0",
-    "text": "中心接警情况统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": ""
-    },
-    "iconCls": "ext-icon-application_side_tree",
-    "id": "1",
-    "text": "分站统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/SubstationVisit"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "10",
-    "pid": "1",
-    "text": "急救站出诊情况查询"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/SubstationLateVisit"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "11",
-    "pid": "1",
-    "text": "急救站晚出诊统计"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/DriverWork"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "13",
-    "pid": "1",
-    "text": "司机工作情况查询"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/DoctorWork"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "14",
-    "pid": "1",
-    "text": "医生工作情况查询"
-  },
-  {
-    "attributes": {
-      "target": "",
-      "url": "/NurseWork"
-    },
-    "iconCls": "ext-icon-world",
-    "id": "14",
-    "pid": "1",
-    "text": "护士工作情况查询"
+    "text": "33 调度员工作效率统计"
   }
 ]

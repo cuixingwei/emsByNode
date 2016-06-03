@@ -9,7 +9,6 @@ var session = require('express-session');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var center = require('./routes/center');
-var page = require('./routes/page');
 var dictionary = require('./routes/dictionary');
 
 var app = express();
@@ -30,7 +29,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: 'xhs ems', // 建议使用 128 个字符的随机字符串
-    cookie: {maxAge: 60 * 1000},
     resave: false,
     saveUninitialized: true
 }));
@@ -41,7 +39,6 @@ app.use(session({
 app.use('/', routes);
 app.use('/users', users);
 app.use('/center', center);
-app.use('/page', page);
 app.use('/dictionary', dictionary);
 
 // catch 404 and forward to error handler

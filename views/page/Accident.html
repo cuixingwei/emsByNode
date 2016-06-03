@@ -4,142 +4,159 @@
     <meta charset="UTF-8">
     <title></title>
     <% include ../head.html %>
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+        }
+
+        table td {
+            border: 1px solid #000000;
+            text-align: center;
+        }
+
+        table th {
+            border: 1px solid #000000;
+            text-align: center;
+        }
+    </style>
     <script type="text/javascript">
-        var grid;
-        var exportData = function () {
-            var url = "/center/exportAccident?startTime="
-                    + $('#startTime').datetimebox('getValue') + "&endTime="
-                    + $('#endTime').datetimebox('getValue') + "&callPhone=" + $('callPhone').val() + "&eventName="
-                    + $('#eventName').val() + "&address=" + $('#address').val() + "&eventType="
-                    + $('#eventType').combobox('getValue') + "&dispatcher=" + $('#dispatcher').val();
-            window.location.href = url;
+        var printData = function (oper) {
+            if (oper < 10) {
+                bdhtml = window.document.body.innerHTML;//获取当前页的html代码
+                sprnstr = "<!--startprint" + oper + "-->";//设置打印开始区域
+                eprnstr = "<!--endprint" + oper + "-->";//设置打印结束区域
+                prnhtml = bdhtml.substring(bdhtml.indexOf(sprnstr) + 18); //从开始代码向后取html
+
+                prnhtml = prnhtml.substring(0, prnhtml.indexOf(eprnstr));//从结束代码向前取html
+                prnhtml = '<style type="text/css"> table {  border-collapse: collapse;   }   table td {  border: 1px solid #000000;  text-align: center; font-size: 10px }      table th {     border: 1px solid #000000;   text-align: center;   }   </style>' + prnhtml;
+
+                // 生成并打印ifrme
+                var syfPrint = window.frames[0];
+                syfPrint.document.body.innerHTML = prnhtml;
+                syfPrint.document.execCommand("Print");
+            }
+            else {
+                window.print();
+            }
         };
         /* 初始化页面标签 */
         function init() {
+            $("#printTimeSpan").html(getCurrentTime());
             $('#startTime').datetimebox({
                 required: true,
-                value: firstOfMouth()
+                editable: false,
+                value: GetDateStr(0)
             });
             $('#endTime').datetimebox({
-                value: getCurrentTime()
+                value: GetDateStr(1),
+                editable: false
             });
-            $('#eventType').combobox({
-                url: '/dictionary/getDictionaryByType?type=14',
-                valueField: 'id',
-                textField: 'name',
-                method: 'get',
-                panelHeight: 'auto',
-                editable: false,
-                onLoadSuccess: function (data) {
-                    if (data) {
-                        $('#eventType').combobox('setValue', data[0].id);
+            $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
+            $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+        }
+
+        /*查询操作*/
+        var query = function () {
+            $("#printTimeSpan").html(getCurrentTime());
+            $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
+            $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+            $.messager.progress({
+                text : '数据加载中....'
+            });
+            $.post("/center/getAccident", cxw.serializeObject($('#searchForm')), function (result, status) {
+                var str = '';
+                if (status == 'success') {
+                    $.messager.progress('close');
+                    if (result.length > 0) {
+                        $.each(result, function (i, ob) {//填充表1数据
+                            str += '<tr><td>' + (i + 1) + '</td><td>' + ob.acceptTime + '</td><td>' + ob.localAddr + '</td><td>' + ob.eventName + '</td><td>'
+                                    + ob.station + '</td><td>' + ob.carNumbers + '</td><td>' + ob.rescuePersons + '</td><td>' + ob.heavyPersons + '</td><td>' + ob.mediumPersons + '</td><td>'
+                                    + ob.lightPersons + '</td><td>' + ob.deathPerson + '</td><td>' + ob.sendAddr + '</td><td>' + ob.report + '</td><td>' + ob.dispatcher + '</td></tr>';
+                        });
                     }
+                    str += '<tr><td style="text-align: center" colspan="14">共' + result.length + '条记录</td></tr>';
+                    $("#table1 tbody").empty().append(str);
+                } else {
+                    $.messager.progress('close');
+                    $.messager.alert('提示','查询失败!','info');
                 }
             });
-
-            grid = $('#grid').datagrid(
-                    {
-                        url: '/center/getAccident',
-                        pagePosition: 'bottom',
-                        pagination: true,
-                        striped: true,
-                        singleSelect: true,
-                        rownumbers: true,
-                        idField: 'eventCode',
-                        pageSize: 20,
-                        pageList: [10, 20, 30, 40, 50, 100, 200, 300, 400, 500],
-                        columns: [[{
-                            field: 'eventName',
-                            title: '事件名称',
-                            width: "14%",
-                            align: 'center'
-                        }, {
-                            field: 'firstAcceptTime',
-                            title: '时间',
-                            width: "14%",
-                            align: 'center'
-                        }, {
-                            field: 'eventType',
-                            title: '事件类别',
-                            width: "14%",
-                            align: 'center'
-                        }, {
-                            field: 'firstAlarmCall',
-                            title: '首次呼救电话',
-                            width: "14%",
-                            align: 'center'
-                        }, {
-                            field: 'firstDisptcher',
-                            title: '调度员',
-                            width: "14%",
-                            align: 'center'
-                        }, {
-                            field: 'centerName',
-                            title: '所属单位',
-                            width: "14%",
-                            align: 'center'
-                        }, {
-                            field: 'localAddr',
-                            title: '事发地点',
-                            width: "14%",
-                            align: 'center'
-                        }]],
-                        toolbar: '#toolbar',
-                        onBeforeLoad: function (param) {
-                            var varify = cxw.checkStartTimeBeforeEndTime(
-                                    '#startTime', '#endTime');
-                            if (!varify) {
-                                parent.$.messager.alert('警告', '结束时间要大于开始时间', 'warning');
-                            }
-                        }
-                    });
-        }
+        };
 
         $(document).ready(function () {
             init();
-            grid.datagrid('load', cxw.serializeObject($('#searchForm')));
+            query();
         });
     </script>
 </head>
 <body class="easyui-layout" data-options="fit:true,border:false">
-<div id="toolbar" style="display: none;">
+<iframe src="" width="0" height="0" frameborder="0"></iframe>
+<div data-options="region:'north',title:'查询条件',split:true" style="height:80px;">
     <form id="searchForm">
-        <div>
-            <div style="width: 20%;display: inline-block;">
-                <label>呼救电话</label><input type="text" name="callPhone" style="width: 150px">
+        <div style="padding: 10px;">
+            <div style="width: 24%;float: left;display: inline-block;">
+                <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">开始时刻:</label>
+                <input id="startTime" name="startTime" style="width: 150px;"/>
             </div>
-            <div style="width: 20%;display: inline-block;">
-                <label>事件名称</label><input type="text" name="eventName" style="width: 150px">
+            <div style="width: 24%;display: inline-block;">
+                <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">结束时刻:</label>
+                <input id="endTime" name="endTime" style="width: 150px;"/>
             </div>
-            <div style="width: 20%;display: inline-block;">
-                <label>事发地点</label><input type="text" name="address" style="width: 150px">
-            </div>
-            <div style="width: 20%;display: inline-block;">
-                <label>事件类别</label><input style="width: 150px" id="eventType" name="eventType"/></div>
-        </div>
-        <div>
-            <div style="width: 20%;display: inline-block;">
-                <label>调度员</label><input style="width: 150px" name="dispatcher"/></div>
-            <div style="width: 20%;display: inline-block;">
-                <label>开始时刻</label><input id="startTime" name="startTime" style="width: 150px;"/></div>
-            <div style="width: 20%;display: inline-block;">
-                <label>结束时刻</label><input id="endTime" name="endTime" style="width: 150px;"/></div>
-            <div style="width: 20%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
+                   style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
                    data-options="iconCls:'ext-icon-zoom',plain:true"
-                   onclick=" grid.datagrid('load', cxw.serializeObject($('#searchForm')));">查询</a>
+                   onclick="query();">查询</a>
             </div>
-        </div>
-        <div>
-            <div class="th"><a href="javascript:void(0);" class="easyui-linkbutton"
-                               data-options="iconCls:'ext-icon-table_go',plain:true"
-                               onclick="exportData();">导出</a></div>
+            <div style="width: 24%;display: inline-block;float: right;">
+                <a href="javascript:void(0);" class="easyui-linkbutton"
+                   data-options="iconCls:'ext-icon-printer',plain:true"
+                   onclick="printData(1);">打印</a>
+            </div>
         </div>
     </form>
 </div>
+<div data-options="region:'center',border:false">
+    <!--startprint1-->
+    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
+        <caption style="font-size:20px;"><b>鄂州市医疗紧急救援中心突发性公共卫生事件院前急救指挥调度表</b></caption>
+        <thead>
+        <tr>
+            <td colspan="5" style="border:none;font-size: 10px;text-align: left">
+                <span>开始时间:</span>
+                <span id="startTimeSpan"></span>
+            </td>
+            <td colspan="5" style="border:none;font-size: 10px;text-align: left">
+                <span>结束时间:</span>
+                <span id="endTimeSpan"></span>
+            </td>
+            <td colspan="4" style="border:none;font-size: 10px;text-align: right">
+                <span>打印时间:</span>
+                <span id="printTimeSpan"></span>
+            </td>
+        </tr>
+        <tr>
+            <th>序号</th>
+            <th>日期时间</th>
+            <th>事件地点</th>
+            <th>事件名称</th>
+            <th>急救站</th>
+            <th>车次</th>
+            <th>抢救人数</th>
+            <th>重伤人数</th>
+            <th>中伤人数</th>
+            <th>轻伤人数</th>
+            <th>死亡人数</th>
+            <th>送往地点</th>
+            <th>向中心领导汇报情况</th>
+            <th>调度员</th>
+        </tr>
+        </thead>
+        <tbody>
 
-<div data-options="region:'center',fit:true,border:false">
-    <table id="grid" data-options="fit:true,border:false"></table>
+        </tbody>
+    </table>
+    <!--endprint1-->
 </div>
 </body>
 </html>

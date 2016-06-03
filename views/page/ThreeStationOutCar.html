@@ -39,9 +39,10 @@
                 window.print();
             }
         };
+
+
         /* 初始化页面标签 */
         function init() {
-            $("#printTimeSpan").html(getCurrentTime());
             $('#startTime').datetimebox({
                 required: true,
                 editable: false,
@@ -53,6 +54,7 @@
             });
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+            $("#printTimeSpan").html(getCurrentTime());
         }
 
         /*查询操作*/
@@ -63,27 +65,27 @@
             $("#printTimeSpan").html(getCurrentTime());
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
-            $.post("/center/getDispatcherWorkload", cxw.serializeObject($('#searchForm')), function (result, status) {
+            $.post("/center/getThreeStationOutCar", cxw.serializeObject($('#searchForm')), function (result, status) {
                 if (status == 'success') {
                     $.messager.progress('close');
                     var str = '';
-                    if (result.length > 0) {
-                        $.each(result, function (i, ob) {//填充表1数据
-                            if (ob.userId == '合计') {
-                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            } else {
-                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            }
-                        });
-                    }
+                    $.each(result.result, function (i, ob) {//填充表1数据
+                        if (i == 0 || i == 3 || i == 6) {
+                            str += '<tr><td rowspan="3">' + ob.station + '</td><td>' + ob.project + '</td><td>' + ob.outCars + '</td><td>' + ob.noPass + '</td><td>' + ob.pass2 + '</td><td>' + ob.pass3 + '</td><td>' + ob.pass4 + '</td><td>'
+                                    + ob.pass5 + '</td><td>' + ob.pass10 + '</td><td>' + ob.total + '</td><td>' + ob.ratio + '</td></tr>';
+                        } else if (i == 9) {
+                            str += '<tr><td colspan="2">' + ob.project + '</td><td>' + ob.outCars + '</td><td>' + ob.noPass + '</td><td>' + ob.pass2 + '</td><td>' + ob.pass3 + '</td><td>' + ob.pass4 + '</td><td>'
+                                    + ob.pass5 + '</td><td>' + ob.pass10 + '</td><td>' + ob.total + '</td><td>' + ob.ratio + '</td></tr>';
+                        } else {
+                            str += '<tr><td>' + ob.project + '</td><td>' + ob.outCars + '</td><td>' + ob.noPass + '</td><td>' + ob.pass2 + '</td><td>' + ob.pass3 + '</td><td>' + ob.pass4 + '</td><td>'
+                                    + ob.pass5 + '</td><td>' + ob.pass10 + '</td><td>' + ob.total + '</td><td>' + ob.ratio + '</td></tr>';
+                        }
+                    });
                     $("#table1 tbody").empty().append(str);
                 } else {
                     $.messager.progress('close');
                     $.messager.alert('提示', '查询失败!', 'info');
                 }
-
             });
         };
 
@@ -106,13 +108,13 @@
                 <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">结束时刻:</label>
                 <input id="endTime" name="endTime" style="width: 150px;"/>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
                    data-options="iconCls:'ext-icon-zoom',plain:true"
                    onclick="query();">查询</a>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;float: right;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    data-options="iconCls:'ext-icon-printer',plain:true"
                    onclick="printData(1);">打印</a>
@@ -122,15 +124,16 @@
 </div>
 <div data-options="region:'center',border:false">
     <!--startprint1-->
-    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
-        <caption style="font-size:20px;"><b>调度员工作量统计</b></caption>
+    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0" align="center"
+           style="table-layout:fixed;">
+        <caption style="font-size:20px;"><b id="caption">鄂州市医疗紧急救援中心急救站出车情况月、季、年统计表</b></caption>
         <thead>
         <tr>
             <td colspan="3" style="border:none;font-size: 10px;text-align: left">
                 <span>开始时间:</span>
                 <span id="startTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td colspan="4" style="border:none;font-size: 10px;">
                 <span>结束时间:</span>
                 <span id="endTimeSpan"></span>
             </td>
@@ -140,15 +143,19 @@
             </td>
         </tr>
         <tr>
-            <th>调度员工号</th>
-            <th>调度员姓名</th>
-            <th>接电话数</th>
-            <th>受理数</th>
-            <th>有效受理数</th>
-            <th>110受理数</th>
-            <th>平均受理时间</th>
-            <th>平均派车时间</th>
-            <th>受理比例</th>
+            <th rowspan="2" colspan="2">急救站\车次数</th>
+            <th rowspan="2">出车数</th>
+            <th rowspan="2">未超时</th>
+            <th colspan="7">超时情况统计</th>
+        </tr>
+        <tr>
+            <th>超过2分钟</th>
+            <th>超过3分钟</th>
+            <th>超过4分钟</th>
+            <th>超过5分钟</th>
+            <th>超过10分钟</th>
+            <th>合计</th>
+            <th>所占比例</th>
         </tr>
         </thead>
         <tbody>

@@ -45,10 +45,10 @@
             $('#startTime').datetimebox({
                 required: true,
                 editable: false,
-                value: GetDateMonthStr(0)
+                value: GetDateStr(0)
             });
             $('#endTime').datetimebox({
-                value: GetDateMonthStr(1),
+                value: GetDateStr(1),
                 editable: false
             });
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
@@ -63,22 +63,80 @@
             $("#printTimeSpan").html(getCurrentTime());
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
-            $.post("/center/getDispatcherWorkload", cxw.serializeObject($('#searchForm')), function (result, status) {
+            $.post("/center/getHookSpeedStatistics", cxw.serializeObject($('#searchForm')), function (result, status) {
                 if (status == 'success') {
                     $.messager.progress('close');
-                    var str = '';
+                    var categories = [];
+                    var data1 = [];
+                    var dataAvg = [];
                     if (result.length > 0) {
-                        $.each(result, function (i, ob) {//填充表1数据
-                            if (ob.userId == '合计') {
-                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
+                        $.each(result, function (i, ob) {
+                            if (ob.username != '平均摘机时间') {
+                                categories.push(ob.username);
+                                data1.push(ob.avgTime);
                             } else {
-                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
+                                for (var i = 0; i < result.length - 1; i++) {
+                                    dataAvg.push(ob.avgTime);
+                                }
                             }
                         });
+                        var chart = {
+                            type: 'column'
+                        };
+                        var title = {
+                            text: '受理人员摘机速度统计报表'
+                        };
+                        var subtitle = {
+                            text: ''
+                        };
+                        var xAxis = {
+                            categories: categories
+                        };
+                        var yAxis = {
+                            min: 0,
+                            title: {
+                                text: '摘机时间(秒)'
+                            }
+                        };
+                        var tooltip = {
+                            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                            '<td style="padding:0"><b>{point.y:.1f} 秒</b></td></tr>',
+                            footerFormat: '</table>',
+                            shared: true,
+                            useHTML: true
+                        };
+                        var plotOptions = {
+                            column: {
+                                pointPadding: 0.2,
+                                borderWidth: 0
+                            }
+                        };
+                        var credits = {
+                            enabled: false
+                        };
+
+                        var series = [{
+                            name: '单个调度员平均摘机时间',
+                            data: data1
+                        }, {
+                            name: '全部调度员平均摘机时间',
+                            data: dataAvg
+                        }
+                        ];
+
+                        var json = {};
+                        json.chart = chart;
+                        json.title = title;
+                        json.subtitle = subtitle;
+                        json.tooltip = tooltip;
+                        json.xAxis = xAxis;
+                        json.yAxis = yAxis;
+                        json.series = series;
+                        json.plotOptions = plotOptions;
+                        json.credits = credits;
+                        $('#container').highcharts(json);
                     }
-                    $("#table1 tbody").empty().append(str);
                 } else {
                     $.messager.progress('close');
                     $.messager.alert('提示', '查询失败!', 'info');
@@ -106,13 +164,13 @@
                 <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">结束时刻:</label>
                 <input id="endTime" name="endTime" style="width: 150px;"/>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
                    data-options="iconCls:'ext-icon-zoom',plain:true"
                    onclick="query();">查询</a>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;float: right;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    data-options="iconCls:'ext-icon-printer',plain:true"
                    onclick="printData(1);">打印</a>
@@ -122,39 +180,7 @@
 </div>
 <div data-options="region:'center',border:false">
     <!--startprint1-->
-    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
-        <caption style="font-size:20px;"><b>调度员工作量统计</b></caption>
-        <thead>
-        <tr>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
-                <span>开始时间:</span>
-                <span id="startTimeSpan"></span>
-            </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
-                <span>结束时间:</span>
-                <span id="endTimeSpan"></span>
-            </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: right">
-                <span>打印时间:</span>
-                <span id="printTimeSpan"></span>
-            </td>
-        </tr>
-        <tr>
-            <th>调度员工号</th>
-            <th>调度员姓名</th>
-            <th>接电话数</th>
-            <th>受理数</th>
-            <th>有效受理数</th>
-            <th>110受理数</th>
-            <th>平均受理时间</th>
-            <th>平均派车时间</th>
-            <th>受理比例</th>
-        </tr>
-        </thead>
-        <tbody>
-
-        </tbody>
-    </table>
+    <div id="container" style="width: 80%;margin: 0 auto"></div>
     <!--endprint1-->
 </div>
 </body>

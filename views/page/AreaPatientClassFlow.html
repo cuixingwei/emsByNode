@@ -39,9 +39,10 @@
                 window.print();
             }
         };
+
+
         /* 初始化页面标签 */
         function init() {
-            $("#printTimeSpan").html(getCurrentTime());
             $('#startTime').datetimebox({
                 required: true,
                 editable: false,
@@ -53,6 +54,7 @@
             });
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+            $("#printTimeSpan").html(getCurrentTime());
         }
 
         /*查询操作*/
@@ -63,27 +65,20 @@
             $("#printTimeSpan").html(getCurrentTime());
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
-            $.post("/center/getDispatcherWorkload", cxw.serializeObject($('#searchForm')), function (result, status) {
+            $.post("/center/getAreaPatientClassFlow", cxw.serializeObject($('#searchForm')), function (result, status) {
                 if (status == 'success') {
                     $.messager.progress('close');
                     var str = '';
-                    if (result.length > 0) {
-                        $.each(result, function (i, ob) {//填充表1数据
-                            if (ob.userId == '合计') {
-                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            } else {
-                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            }
-                        });
-                    }
+                    $.each(result, function (i, ob) {//填充表1数据
+                        str += '<tr><td>' + ob.dateTime + '</td><td>' + ob.eventType + '</td><td>' + ob.area + '</td><td>' + ob.localAddr
+                                + '</td><td>' + ob.chief + '</td><td>' + ob.phoneJudge + '</td><td>' + ob.patientName + '</td><td>' + ob.sex + '</td><td>' + ob.age + '</td></tr>';
+                    });
+                    str += '<tr><td style="text-align: center" colspan="9">共' + result.length + '条记录</td></tr>';
                     $("#table1 tbody").empty().append(str);
                 } else {
                     $.messager.progress('close');
                     $.messager.alert('提示', '查询失败!', 'info');
                 }
-
             });
         };
 
@@ -106,13 +101,13 @@
                 <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">结束时刻:</label>
                 <input id="endTime" name="endTime" style="width: 150px;"/>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
                    data-options="iconCls:'ext-icon-zoom',plain:true"
                    onclick="query();">查询</a>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 24%;display: inline-block;float: right;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    data-options="iconCls:'ext-icon-printer',plain:true"
                    onclick="printData(1);">打印</a>
@@ -122,33 +117,33 @@
 </div>
 <div data-options="region:'center',border:false">
     <!--startprint1-->
-    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
-        <caption style="font-size:20px;"><b>调度员工作量统计</b></caption>
+    <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0" align="center" style="">
+        <caption style="font-size:20px;"><b id="caption"> 呼救区域病种分类流水表</b></caption>
         <thead>
         <tr>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td style="border:none;font-size: 10px;text-align: left;" colspan="3">
                 <span>开始时间:</span>
                 <span id="startTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td style="border:none;font-size: 10px;" colspan="3">
                 <span>结束时间:</span>
                 <span id="endTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: right">
+            <td style="border:none;font-size: 10px;text-align: right" colspan="3">
                 <span>打印时间:</span>
                 <span id="printTimeSpan"></span>
             </td>
         </tr>
         <tr>
-            <th>调度员工号</th>
-            <th>调度员姓名</th>
-            <th>接电话数</th>
-            <th>受理数</th>
-            <th>有效受理数</th>
-            <th>110受理数</th>
-            <th>平均受理时间</th>
-            <th>平均派车时间</th>
-            <th>受理比例</th>
+            <th>日期时间</th>
+            <th>事件类型</th>
+            <th>呼救区域</th>
+            <th>现场地址</th>
+            <th>主诉</th>
+            <th>电话判断</th>
+            <th>患者姓名</th>
+            <th>性别</th>
+            <th>年龄</th>
         </tr>
         </thead>
         <tbody>

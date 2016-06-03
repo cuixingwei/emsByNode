@@ -53,6 +53,19 @@
             });
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
+
+            $('#dispatcher').combobox({
+                url: '/dictionary/getDispatcher',
+                valueField: 'id',
+                textField: 'name',
+                method: 'get',
+                editable: false,
+                onLoadSuccess: function (data) {
+                    if (data) {
+                        $('#dispatcher').combobox('setValue', data[0].id);
+                    }
+                }
+            });
         }
 
         /*查询操作*/
@@ -63,27 +76,24 @@
             $("#printTimeSpan").html(getCurrentTime());
             $("#startTimeSpan").html($('#startTime').datetimebox('getValue'));
             $("#endTimeSpan").html($('#endTime').datetimebox('getValue'));
-            $.post("/center/getDispatcherWorkload", cxw.serializeObject($('#searchForm')), function (result, status) {
+            $.post("/center/getHungEventHandle", cxw.serializeObject($('#searchForm')), function (result, status) {
                 if (status == 'success') {
                     $.messager.progress('close');
                     var str = '';
                     if (result.length > 0) {
                         $.each(result, function (i, ob) {//填充表1数据
-                            if (ob.userId == '合计') {
-                                str += '<tr><td colspan="2">' + ob.userId + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            } else {
-                                str += '<tr><td>' + ob.userId + '</td><td>' + ob.username + '</td><td>' + ob.phones + '</td><td>' + ob.acceptNumbers + '</td><td>'
-                                        + ob.validAcceptNumbers + '</td><td>' + ob.acceptNumbers110 + '</td><td>' + ob.avgAcceptTime + '</td><td>' + ob.avgSendCarTime + '</td><td>' + ob.ratio + '</td></tr>';
-                            }
+                            str += '<tr><td>' + ob.wake + '</td><td>' + ob.dropTask + '</td><td>' + ob.backCar + '</td><td>' + ob.other + '</td><td>'
+                                    + ob.total + '</td></tr>';
                         });
+                    } else {
+                        str += '<tr><td style="text-align: center" colspan="15">没有挂起记录</td></tr>';
                     }
+
                     $("#table1 tbody").empty().append(str);
                 } else {
                     $.messager.progress('close');
                     $.messager.alert('提示', '查询失败!', 'info');
                 }
-
             });
         };
 
@@ -106,13 +116,16 @@
                 <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">结束时刻:</label>
                 <input id="endTime" name="endTime" style="width: 150px;"/>
             </div>
+            <div style="width: 24%;display: inline-block;">
+                <label style="width: 70px;text-align: right;display: inline-block;margin-right: 5px;">调度员:</label>
+                <input style="width: 150px" id="dispatcher" name="dispatcher"/></div>
             <div style="width: 10%;display: inline-block;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    style="width: 100px;text-align: right;display: inline-block;margin-right: 5px;"
                    data-options="iconCls:'ext-icon-zoom',plain:true"
                    onclick="query();">查询</a>
             </div>
-            <div style="width: 10%;display: inline-block;">
+            <div style="width: 10%;display: inline-block;float: right;">
                 <a href="javascript:void(0);" class="easyui-linkbutton"
                    data-options="iconCls:'ext-icon-printer',plain:true"
                    onclick="printData(1);">打印</a>
@@ -123,32 +136,28 @@
 <div data-options="region:'center',border:false">
     <!--startprint1-->
     <table id="table1" width="99%" cellpadding="0" cellspacing="0" border="0">
-        <caption style="font-size:20px;"><b>调度员工作量统计</b></caption>
+        <caption style="font-size:20px;"><b>待派处理情况统计表</b></caption>
         <thead>
         <tr>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td colspan="2" style="border:none;font-size: 10px;text-align: left">
                 <span>开始时间:</span>
                 <span id="startTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: left">
+            <td colspan="1" style="border:none;font-size: 10px;text-align: left">
                 <span>结束时间:</span>
                 <span id="endTimeSpan"></span>
             </td>
-            <td colspan="3" style="border:none;font-size: 10px;text-align: right">
+            <td colspan="2" style="border:none;font-size: 10px;text-align: right">
                 <span>打印时间:</span>
                 <span id="printTimeSpan"></span>
             </td>
         </tr>
         <tr>
-            <th>调度员工号</th>
-            <th>调度员姓名</th>
-            <th>接电话数</th>
-            <th>受理数</th>
-            <th>有效受理数</th>
-            <th>110受理数</th>
-            <th>平均受理时间</th>
-            <th>平均派车时间</th>
-            <th>受理比例</th>
+            <th>唤醒待派</th>
+            <th>调度员撤销待派</th>
+            <th>病家退车</th>
+            <th>其他</th>
+            <th>合计</th>
         </tr>
         </thead>
         <tbody>
