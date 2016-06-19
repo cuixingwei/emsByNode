@@ -2326,7 +2326,7 @@ exports.getNoAreaStatistics = function (req, res) {
                 var reinforce = string.isEquals('增援派车', judge) ? '是' : '否';
                 var other = string.isEquals('其他', judge) ? '是' : '否';
 
-                if (station.indexOf('一医') != -1 && sendAddr.indexOf('二医') != -1) { //一医派二医
+                if ((station.indexOf('中心医院') != -1 || station.indexOf('华容') != -1 || station.indexOf('太和') != -1 || station.indexOf('高速') != -1) && sendAddr.indexOf('二医') != -1) { //一医派二医
                     if (string.isEquals('是', patientAsk)) {
                         rs1.patientAsk = parseInt(rs1.patientAsk) + 1;
                     }
@@ -2341,7 +2341,7 @@ exports.getNoAreaStatistics = function (req, res) {
                     }
                 }
 
-                if (station.indexOf('一医') != -1 && sendAddr.indexOf('鄂钢') != -1) { //一医派鄂钢
+                if ((station.indexOf('中心医院') != -1 || station.indexOf('华容') != -1 || station.indexOf('太和') != -1 || station.indexOf('高速') != -1) && sendAddr.indexOf('鄂钢') != -1) { //一医派鄂钢
                     if (string.isEquals('是', patientAsk)) {
                         rs2.patientAsk = parseInt(rs2.patientAsk) + 1;
                     }
@@ -2355,7 +2355,7 @@ exports.getNoAreaStatistics = function (req, res) {
                         rs2.reinforce = parseInt(rs2.reinforce) + 1;
                     }
                 }
-                if (station.indexOf('二医') != -1 && sendAddr.indexOf('一医') != -1) { //二医派一医
+                if (station.indexOf('二医') != -1 && (sendAddr.indexOf('中心医院') != -1 || sendAddr.indexOf('华容') != -1 || sendAddr.indexOf('太和') != -1 || sendAddr.indexOf('高速') != -1)) { //二医派一医
                     if (string.isEquals('是', patientAsk)) {
                         rs3.patientAsk = parseInt(rs3.patientAsk) + 1;
                     }
@@ -2383,7 +2383,7 @@ exports.getNoAreaStatistics = function (req, res) {
                         rs4.reinforce = parseInt(rs4.reinforce) + 1;
                     }
                 }
-                if (station.indexOf('鄂钢') != -1 && sendAddr.indexOf('一医') != -1) { //鄂钢派一医
+                if (station.indexOf('鄂钢') != -1 && (sendAddr.indexOf('中心医院') != -1 || sendAddr.indexOf('华容') != -1 || sendAddr.indexOf('太和') != -1 || sendAddr.indexOf('高速') != -1)) { //鄂钢派一医
                     if (string.isEquals('是', patientAsk)) {
                         rs5.patientAsk = parseInt(rs5.patientAsk) + 1;
                     }
@@ -2784,29 +2784,34 @@ exports.getAreaPatientClassFlowStatistics = function (req, res) {
     var params = [{"name": "startTime", "value": startTime, "type": "varchar"}, {
         "name": "endTime", "value": endTime, "type": "varchar"
     }];
-    var sql = "select a.开始受理时刻,a.现场地址,a.受理序号,a.事件编码,a.年龄,a.性别,a.患者姓名,a.初步判断,a.类型编码,    " +
-        "case when a.现场地址 like '%杜山镇%' or a.现场地址 like '%长港镇%' or a.现场地址 like '%长农%' or a.现场地址 like '%新庙镇%' or a.现场地址 like '%燕矶镇%' or a.现场地址 like '%沙窝乡%' or a.现场地址 like '%泽林镇%' or a.现场地址 like '%碧石镇%' or a.现场地址 like '%汀祖镇%' or a.现场地址 like '%花湖镇%' or a.现场地址 like '%杨叶镇%' then '鄂城区'    " +
-        "when a.现场地址 like '%临江乡%' or a.现场地址 like '%胡林%' or a.现场地址 like '%段店镇%' or a.现场地址 like '%泥矶%' or a.现场地址 like '%华容镇%' or a.现场地址 like '%蒲团乡%' or a.现场地址 like '%庙岭镇%'  then '华容区'    " +
-        "when a.现场地址 like '%东沟镇%' or a.现场地址 like '%沼山镇%' or a.现场地址 like '%梁子岛%' or a.现场地址 like '%西长岭%' or a.现场地址 like '%太和镇%' or a.现场地址 like '%涂家垴镇%' or a.现场地址 like '%公友%' or a.现场地址 like '%涂镇%' then '梁子湖区'    " +
-        "when a.现场地址 like '%葛店开发区%' or a.现场地址 like '%大湾%'  then '葛店开发区' else '城区' end 区域,    " +
-        "case when a.现场地址 like '%杜山镇%' then '杜山镇' when (a.现场地址 like '%长港镇%' or a.现场地址 like '%长农%') then '长港镇/长农'  when a.现场地址 like '%新庙镇%' then '新庙镇'" +
-        "when a.现场地址 like '%燕矶镇%' then '燕矶镇' when a.现场地址 like '%沙窝乡%' then '沙窝乡' when a.现场地址 like '%泽林镇%' then '泽林镇' when a.现场地址 like '%碧石镇%' then '碧石镇'    " +
-        "when a.现场地址 like '%汀祖镇%' then '汀祖镇' when a.现场地址 like '%花湖镇%' then '花湖镇' when a.现场地址 like '%杨叶镇%' then '杨叶镇' 	when (a.现场地址 like '%临江乡%' or a.现场地址 like '%胡林%') then '临江乡/胡林' " +
-        "when (a.现场地址 like '%段店镇%' or a.现场地址 like '%泥矶%') then '段店镇/泥矶' when a.现场地址 like '%华容镇%' then '华容镇'    when a.现场地址 like '%蒲团乡%' then '蒲团乡' when a.现场地址 like '%庙岭镇%'  then '庙岭镇' " +
-        "when a.现场地址 like '%东沟镇%' then '东沟镇' when a.现场地址 like '%沼山镇%' then '沼山镇' when (a.现场地址 like '%梁子岛%' or a.现场地址 like '%西长岭%') then '梁子岛/西长岭' when a.现场地址 like '%太和镇%' then '太和镇'    " +
-        "when (a.现场地址 like '%涂家垴镇%' or a.现场地址 like '%公友%' or a.现场地址 like '%涂镇%') then '涂家垴镇/公友/涂镇' when (a.现场地址 like '%葛店开发区%' or a.现场地址 like '%大湾%')  then '葛店开发区/大湾' else '城区' end 乡镇,    " +
-        "case when a.初步判断 like '%外伤1%' then '车祸外伤'    when (a.初步判断 like '%外伤%' or a.初步判断 like '%骨折%' or a.初步判断 like '%坠落伤%' or a.初步判断 like '%摔伤%') and a.初步判断 not like '%外伤1%' then '其他外伤'    " +
-        "when a.初步判断 like '%心脏聚停%' or a.初步判断 like '%高血压%' or a.初步判断 like '%风湿性心脏病%' or a.初步判断 like '%急性冠脉综合征%' or a.初步判断 like '%心肌梗塞%' or a.初步判断 like '%心率失常%' or a.初步判断 like '%心包压塞%' or a.初步判断 like '%蛛网膜下腔出血%' or a.初步判断 like '%脑出血%' or a.初步判断 like '%脑梗塞%' or a.初步判断 like '%脑血管意外后遗症%' or a.初步判断 like '%低血压%' or a.初步判断 like '%心力衰竭%' or a.初步判断 like '%心源性休克%' or a.初步判断 like '%其他心脑血管疾病%' or a.初步判断 like '%心脏不适%' or a.初步判断 like '%心动过速%' or a.初步判断 like '%心动过缓%' then '心脑血管疾病'    " +
-        "when a.初步判断 like '%晕厥%' or a.初步判断 like '%昏迷%' then '晕厥或昏迷'    when a.初步判断 like '%中毒%' then '中毒'    " +
-        "when a.初步判断 like '%急腹症%' or a.初步判断 like '%消化性溃疡%' or a.初步判断 like '%胃出血%' or a.初步判断 like '%上消化道出血%' or a.初步判断 like '%阑尾炎%' or a.初步判断 like '%腹股沟疝%' or a.初步判断 like '%急性胃肠炎%' or a.初步判断 like '%肠梗阻%' or a.初步判断 like '%腹膜炎%' or a.初步判断 like '%肝硬化%' or a.初步判断 like '%胆囊炎%' or a.初步判断 like '%胰腺炎%' or a.初步判断 like '%急性肝脏衰竭%' or a.初步判断 like '%便血%' or a.初步判断 like '%肠套叠%' or a.初步判断 like '%其他消化系统疾病%' then '消化系统疾病'    " +
-        "when a.初步判断 like '%上呼吸道感染%' or a.初步判断 like '%感冒%' or a.初步判断 like '%支气管炎%' or a.初步判断 like '%肺炎%' or a.初步判断 like '%ARDS%' or a.初步判断 like '%肺气肿%' or a.初步判断 like '%哮喘%' or a.初步判断 like '%支气管扩张%' or a.初步判断 like '%COPD%' or a.初步判断 like '%血、气胸%' or a.初步判断 like '%肺栓塞%' or a.初步判断 like '%呼吸衰竭%' or a.初步判断 like '%其他呼吸系统疾病%' then '呼吸系统疾病'    " +
-        "when a.初步判断 like '%盆腔炎%' or a.初步判断 like '%痛经%' or a.初步判断 like '%功能性子宫出血%' or a.初步判断 like '%阴道出血%' or a.初步判断 like '%卵巢囊肿剃扭转%' or a.初步判断 like '%宫外孕%' or a.初步判断 like '%自然流产%' or a.初步判断 like '%羊水栓塞%' or a.初步判断 like '%妊高症%' or a.初步判断 like '%先兆子痫%' or a.初步判断 like '%先兆流产%' or a.初步判断 like '%胎膜早破%' or a.初步判断 like '%前置胎盘%' or a.初步判断 like '%胎盘早剥%' or a.初步判断 like '%早产%' or a.初步判断 like '%产后出血%' or a.初步判断 like '%子宫破裂%' or a.初步判断 like '%临产%' or a.初步判断 like '%其他妇产科疾病%' or a.初步判断 like '%早产儿%' or a.初步判断 like '%新生儿窒息%' or a.初步判断 like '%新生儿黄疸%' or a.初步判断 like '%新生儿败血症%' or a.初步判断 like '%其他新生儿疾病%' then '妇儿疾病'    when a.初步判断 like '%抽搐%' then '抽搐'    " +
-        "when a.初步判断 like '%中暑%' or a.初步判断 like '%淹溺%' then '中暑淹溺'    else '其他' end '分类'    into #accept from ausp120.tb_AcceptDescriptV a    " +
-        "select a.区域,a.乡镇,a.分类,COUNT(*),'' 构成比    from ausp120.tb_EventV e left outer join #accept a on e.事件编码=a.事件编码    " +
+    /* var sql = "select a.开始受理时刻,a.现场地址,a.受理序号,a.事件编码,a.年龄,a.性别,a.患者姓名,a.初步判断,a.类型编码,    " +
+     "case when a.现场地址 like '%杜山镇%' or a.现场地址 like '%长港镇%' or a.现场地址 like '%长农%' or a.现场地址 like '%新庙镇%' or a.现场地址 like '%燕矶镇%' or a.现场地址 like '%沙窝乡%' or a.现场地址 like '%泽林镇%' or a.现场地址 like '%碧石镇%' or a.现场地址 like '%汀祖镇%' or a.现场地址 like '%花湖镇%' or a.现场地址 like '%杨叶镇%' then '鄂城区'    " +
+     "when a.现场地址 like '%临江乡%' or a.现场地址 like '%胡林%' or a.现场地址 like '%段店镇%' or a.现场地址 like '%泥矶%' or a.现场地址 like '%华容镇%' or a.现场地址 like '%蒲团乡%' or a.现场地址 like '%庙岭镇%'  then '华容区'    " +
+     "when a.现场地址 like '%东沟镇%' or a.现场地址 like '%沼山镇%' or a.现场地址 like '%梁子岛%' or a.现场地址 like '%西长岭%' or a.现场地址 like '%太和镇%' or a.现场地址 like '%涂家垴镇%' or a.现场地址 like '%公友%' or a.现场地址 like '%涂镇%' then '梁子湖区'    " +
+     "when a.现场地址 like '%葛店开发区%' or a.现场地址 like '%大湾%'  then '葛店开发区' else '城区' end 区域,    " +
+     "case when a.现场地址 like '%杜山镇%' then '杜山镇' when (a.现场地址 like '%长港镇%' or a.现场地址 like '%长农%') then '长港镇/长农'  when a.现场地址 like '%新庙镇%' then '新庙镇'" +
+     "when a.现场地址 like '%燕矶镇%' then '燕矶镇' when a.现场地址 like '%沙窝乡%' then '沙窝乡' when a.现场地址 like '%泽林镇%' then '泽林镇' when a.现场地址 like '%碧石镇%' then '碧石镇'    " +
+     "when a.现场地址 like '%汀祖镇%' then '汀祖镇' when a.现场地址 like '%花湖镇%' then '花湖镇' when a.现场地址 like '%杨叶镇%' then '杨叶镇' 	when (a.现场地址 like '%临江乡%' or a.现场地址 like '%胡林%') then '临江乡/胡林' " +
+     "when (a.现场地址 like '%段店镇%' or a.现场地址 like '%泥矶%') then '段店镇/泥矶' when a.现场地址 like '%华容镇%' then '华容镇'    when a.现场地址 like '%蒲团乡%' then '蒲团乡' when a.现场地址 like '%庙岭镇%'  then '庙岭镇' " +
+     "when a.现场地址 like '%东沟镇%' then '东沟镇' when a.现场地址 like '%沼山镇%' then '沼山镇' when (a.现场地址 like '%梁子岛%' or a.现场地址 like '%西长岭%') then '梁子岛/西长岭' when a.现场地址 like '%太和镇%' then '太和镇'    " +
+     "when (a.现场地址 like '%涂家垴镇%' or a.现场地址 like '%公友%' or a.现场地址 like '%涂镇%') then '涂家垴镇/公友/涂镇' when (a.现场地址 like '%葛店开发区%' or a.现场地址 like '%大湾%')  then '葛店开发区/大湾' else '城区' end 乡镇,    " +
+     "case when a.初步判断 like '%外伤1%' then '车祸外伤'    when (a.初步判断 like '%外伤%' or a.初步判断 like '%骨折%' or a.初步判断 like '%坠落伤%' or a.初步判断 like '%摔伤%') and a.初步判断 not like '%外伤1%' then '其他外伤'    " +
+     "when a.初步判断 like '%心脏聚停%' or a.初步判断 like '%高血压%' or a.初步判断 like '%风湿性心脏病%' or a.初步判断 like '%急性冠脉综合征%' or a.初步判断 like '%心肌梗塞%' or a.初步判断 like '%心率失常%' or a.初步判断 like '%心包压塞%' or a.初步判断 like '%蛛网膜下腔出血%' or a.初步判断 like '%脑出血%' or a.初步判断 like '%脑梗塞%' or a.初步判断 like '%脑血管意外后遗症%' or a.初步判断 like '%低血压%' or a.初步判断 like '%心力衰竭%' or a.初步判断 like '%心源性休克%' or a.初步判断 like '%其他心脑血管疾病%' or a.初步判断 like '%心脏不适%' or a.初步判断 like '%心动过速%' or a.初步判断 like '%心动过缓%' then '心脑血管疾病'    " +
+     "when a.初步判断 like '%晕厥%' or a.初步判断 like '%昏迷%' then '晕厥或昏迷'    when a.初步判断 like '%中毒%' then '中毒'    " +
+     "when a.初步判断 like '%急腹症%' or a.初步判断 like '%消化性溃疡%' or a.初步判断 like '%胃出血%' or a.初步判断 like '%上消化道出血%' or a.初步判断 like '%阑尾炎%' or a.初步判断 like '%腹股沟疝%' or a.初步判断 like '%急性胃肠炎%' or a.初步判断 like '%肠梗阻%' or a.初步判断 like '%腹膜炎%' or a.初步判断 like '%肝硬化%' or a.初步判断 like '%胆囊炎%' or a.初步判断 like '%胰腺炎%' or a.初步判断 like '%急性肝脏衰竭%' or a.初步判断 like '%便血%' or a.初步判断 like '%肠套叠%' or a.初步判断 like '%其他消化系统疾病%' then '消化系统疾病'    " +
+     "when a.初步判断 like '%上呼吸道感染%' or a.初步判断 like '%感冒%' or a.初步判断 like '%支气管炎%' or a.初步判断 like '%肺炎%' or a.初步判断 like '%ARDS%' or a.初步判断 like '%肺气肿%' or a.初步判断 like '%哮喘%' or a.初步判断 like '%支气管扩张%' or a.初步判断 like '%COPD%' or a.初步判断 like '%血、气胸%' or a.初步判断 like '%肺栓塞%' or a.初步判断 like '%呼吸衰竭%' or a.初步判断 like '%其他呼吸系统疾病%' then '呼吸系统疾病'    " +
+     "when a.初步判断 like '%盆腔炎%' or a.初步判断 like '%痛经%' or a.初步判断 like '%功能性子宫出血%' or a.初步判断 like '%阴道出血%' or a.初步判断 like '%卵巢囊肿剃扭转%' or a.初步判断 like '%宫外孕%' or a.初步判断 like '%自然流产%' or a.初步判断 like '%羊水栓塞%' or a.初步判断 like '%妊高症%' or a.初步判断 like '%先兆子痫%' or a.初步判断 like '%先兆流产%' or a.初步判断 like '%胎膜早破%' or a.初步判断 like '%前置胎盘%' or a.初步判断 like '%胎盘早剥%' or a.初步判断 like '%早产%' or a.初步判断 like '%产后出血%' or a.初步判断 like '%子宫破裂%' or a.初步判断 like '%临产%' or a.初步判断 like '%其他妇产科疾病%' or a.初步判断 like '%早产儿%' or a.初步判断 like '%新生儿窒息%' or a.初步判断 like '%新生儿黄疸%' or a.初步判断 like '%新生儿败血症%' or a.初步判断 like '%其他新生儿疾病%' then '妇儿疾病'    when a.初步判断 like '%抽搐%' then '抽搐'    " +
+     "when a.初步判断 like '%中暑%' or a.初步判断 like '%淹溺%' then '中暑淹溺'    else '其他' end  分类   into #accept from ausp120.tb_AcceptDescriptV a    " +
+     "select a.区域,a.乡镇,a.分类,COUNT(*),'' 构成比    from ausp120.tb_EventV e left outer join #accept a on e.事件编码=a.事件编码    " +
+     "left outer join ausp120.tb_TaskV t on t.事件编码=a.事件编码 and t.受理序号=a.受理序号    left outer join ausp120.tb_DEventType et on et.Code=e.事件类型编码    " +
+     "left outer join ausp120.tb_Ambulance am on am.车辆编码=t.车辆编码    " +
+     "left outer join ausp120.tb_PatientCase pc on pc.车辆标识=am.实际标识 and pc.任务编码=t.任务编码 and pc.序号=1    " +
+     "where e.事件性质编码=1 and a.类型编码 not in (2,4) and a.开始受理时刻 between @startTime and @endTime    group by a.区域,a.乡镇,a.分类 order by a.区域,a.乡镇,a.分类    drop table #accept   ";*/
+    var sql = "select a.区域,a.乡镇,a.分类,COUNT(*),'' 构成比    from ausp120.tb_EventV e left outer join ausp120.View_AreaPatientClassFlowStatistics a on e.事件编码=a.事件编码    " +
         "left outer join ausp120.tb_TaskV t on t.事件编码=a.事件编码 and t.受理序号=a.受理序号    left outer join ausp120.tb_DEventType et on et.Code=e.事件类型编码    " +
         "left outer join ausp120.tb_Ambulance am on am.车辆编码=t.车辆编码    " +
         "left outer join ausp120.tb_PatientCase pc on pc.车辆标识=am.实际标识 and pc.任务编码=t.任务编码 and pc.序号=1    " +
-        "where e.事件性质编码=1 and a.类型编码 not in (2,4) and a.开始受理时刻 between @startTime and @endTime    group by a.区域,a.乡镇,a.分类 order by a.区域,a.乡镇,a.分类    drop table #accept   ";
+        "where e.事件性质编码=1 and a.类型编码 not in (2,4) and a.开始受理时刻 between @startTime and @endTime    group by a.区域,a.乡镇,a.分类 order by a.区域,a.乡镇,a.分类    ";
     var sqlData = {
         statement: sql,
         params: params
@@ -2817,12 +2822,14 @@ exports.getAreaPatientClassFlowStatistics = function (req, res) {
         "numbers": 0,
         "percent": '100%'
     };
-
+	console.log(sql);
+    var result = []; //查询的结果
     db.select(sqlData, function (err, results) {
         if (err) {
             console.log(results);
+            res.json(result);
         } else {
-            var result = []; //查询的结果
+			console.log(results);
             var numbers;
             var num1 = 0, num2 = 0;
             var columnValue1;//上一个值

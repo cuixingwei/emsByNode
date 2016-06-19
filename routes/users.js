@@ -1,5 +1,6 @@
 var express = require('express');
 var db = require('../utils/msdb');
+var logger  = require("../utils/log").logger; //日志
 
 var router = express.Router();
 
@@ -37,6 +38,7 @@ router.post('/login', function (req, res, next) {
                             msg: "noPermission"
                         });
                     } else {
+                        logger.info(temp[3].value+'的'+temp[1].value+'登录成功');
                         req.session.username = temp[1].value;  //登录成功后存session
                         req.session.userId = temp[0].value; //存入用户ID
                         req.session.center = temp[3].value; //中心名称
